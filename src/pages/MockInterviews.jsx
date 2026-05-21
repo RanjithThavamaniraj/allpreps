@@ -36,7 +36,7 @@ export default function MockInterviews() {
               Mock Interviews
             </h1>
             <p className="page-sub" style={{ maxWidth: '600px', margin: '0 auto', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6' }}>
-              Simulate a real technical interview. Read the scenario, form your answer, and then reveal the expert response to check your knowledge.
+              Simulate a real technical interview. Answer 100 random multiple-choice questions in 1 hour and 15 minutes. Note: You can pause the timer only twice.
             </p>
           </div>
         </header>

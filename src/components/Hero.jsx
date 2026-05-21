@@ -1,135 +1,66 @@
-import { FiSearch, FiZap } from 'react-icons/fi';
-import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
+import { FiZap, FiArrowRight, FiCode, FiServer, FiCloud, FiDatabase, FiTerminal, FiGitBranch } from 'react-icons/fi';
+import { FaAws } from 'react-icons/fa';
 
-const CHIPS = ['Oracle RAC', 'RMAN', 'Linux', 'AWS', 'SQL', 'Kubernetes'];
-
-const MOCK_TRACKS = [
-  { name: 'Oracle DBA', icon: <FaDatabase />, count: 1450, pct: 72 },
-  { name: 'Linux Admin', icon: <FaLinux />,   count: 980,  pct: 55 },
-  { name: 'AWS Cloud',  icon: <FaAws />,      count: 720,  pct: 31 },
+const FEATURES = [
+  { icon: <FiDatabase size={20} />, label: 'Oracle DBA', path: '/oracle-dba' },
+  { icon: <FiTerminal size={20} />, label: 'Linux Admin', path: '/linux-admin' },
+  { icon: <FiCode size={20} />, label: 'SQL', path: '/sql-admin' },
+  { icon: <FaAws size={20} />, label: 'AWS Cloud', path: '/aws-cloud' },
+  { icon: <FiServer size={20} />, label: 'Shell Scripting', path: '/shell-scripting' },
+  { icon: <FiGitBranch size={20} />, label: 'DevOps', path: '/devops' },
+  { icon: <FiCloud size={20} />, label: 'Azure', path: '/azure-cloud' },
+  { icon: <FiCloud size={20} />, label: 'Google Cloud', path: '/google-cloud' },
 ];
 
-export default function Hero({ searchVal, onSearchChange, activeChip, onChipClick }) {
+export default function Hero() {
   return (
-    <section className="hero">
-      <div className="container hero-grid">
+    <section className="hero-v2">
+      {/* Animated background orbs */}
+      <div className="hero-v2-orb hero-v2-orb-1" />
+      <div className="hero-v2-orb hero-v2-orb-2" />
+      <div className="hero-v2-orb hero-v2-orb-3" />
 
-        {/* ── LEFT ── */}
-        <div className="hero-left">
-          <div className="hero-label fade-up">
-            <FiZap size={11} /> Enterprise Interview Prep Platform
-          </div>
-
-          <h1 className="hero-h1 fade-up delay-1">
-            Prepare Smarter.<br />
-            <span className="blue">Crack Interviews.</span>
-          </h1>
-
-          <p className="hero-sub fade-up delay-2">
-            Master Oracle DBA, Linux, SQL, Cloud and production
-            scenarios. Curated by industry experts for senior
-            database administrators and systems architects.
-          </p>
-
-          <form
-            className="hero-search fade-up delay-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const q = (searchVal || '').toLowerCase();
-              let route = '/mock-interviews';
-              if (q.includes('oracle') || q.includes('dba') || q.includes('rac') || q.includes('rman')) {
-                route = '/oracle-dba';
-              } else if (q.includes('linux') || q.includes('unix')) {
-                route = '/linux-admin';
-              } else if (q.includes('sql') || q.includes('database')) {
-                route = '/sql-admin';
-              } else if (q.includes('aws') || q.includes('cloud')) {
-                route = '/aws-cloud';
-              } else if (q.includes('shell') || q.includes('script') || q.includes('bash')) {
-                route = '/shell-scripting';
-              } else if (q.includes('devops') || q.includes('docker') || q.includes('kubernetes')) {
-                route = '/devops';
-              }
-              window.history.pushState({}, '', route);
-              window.dispatchEvent(new Event('popstate'));
-            }}
-          >
-            <FiSearch className="hero-search-icon" />
-            <input
-              type="text"
-              className="input-field"
-              placeholder="Search topics, commands, concepts..."
-              value={searchVal || ''}
-              onChange={e => onSearchChange(e.target.value)}
-            />
-          </form>
-
-          <div className="hero-actions fade-up delay-3">
-            <a href="/mock-interviews" className="btn btn-primary btn-lg">
-              Start Preparing <FiSearch size={14} />
-            </a>
-            <a href="/technologies" className="btn btn-secondary btn-lg">
-              Browse Topics
-            </a>
-          </div>
-
-          <div className="hero-chips fade-up delay-4">
-            <span className="chip-label">Trending:</span>
-            {CHIPS.map(chip => {
-              const id = chip.toLowerCase();
-              return (
-                <button
-                  key={chip}
-                  className={`chip ${activeChip === id ? 'chip-active' : ''}`}
-                  onClick={() => onChipClick(activeChip === id ? '' : id)}
-                >
-                  {chip}
-                </button>
-              );
-            })}
-          </div>
+      <div className="container hero-v2-content">
+        {/* Badge */}
+        <div className="hero-v2-badge fade-up">
+          <FiZap size={12} />
+          <span>Enterprise-Grade Interview Preparation</span>
         </div>
 
-        {/* ── RIGHT — DASHBOARD MOCKUP ── */}
-        <div className="hero-visual fade-up delay-2">
-          <div className="hero-mockup">
-            <div className="mockup-header">
-              <div className="mockup-dots">
-                <span className="mockup-dot dot-r" />
-                <span className="mockup-dot dot-y" />
-                <span className="mockup-dot dot-g" />
-              </div>
-              <span className="mockup-title">AllPreps — My Dashboard</span>
-              <span />
-            </div>
+        {/* Headline */}
+        <h1 className="hero-v2-title fade-up delay-1">
+          Prepare Smarter.<br />
+          <span className="hero-v2-gradient-text">Crack Interviews.</span>
+        </h1>
 
-            <div className="mockup-body">
-              {MOCK_TRACKS.map((t, i) => (
-                <div key={i} className="mockup-track">
-                  <div className="mockup-track-left">
-                    <div className="mockup-track-icon">{t.icon}</div>
-                    <div>
-                      <div className="mockup-track-name">{t.name}</div>
-                      <div className="mockup-track-count">{t.count.toLocaleString()} questions</div>
-                    </div>
-                  </div>
-                  <div className="mockup-prog-wrap">
-                    <div className="mockup-prog-bar">
-                      <div className="mockup-prog-fill" style={{ width: `${t.pct}%` }} />
-                    </div>
-                    <span className="mockup-prog-pct">{t.pct}%</span>
-                  </div>
-                </div>
-              ))}
+        {/* Subtitle */}
+        <p className="hero-v2-sub fade-up delay-2">
+          Master Oracle DBA, Linux, SQL, Cloud, DevOps and production scenarios
+          with 300+ curated questions by industry experts.
+        </p>
 
-              <div className="mockup-footer">
-                <span className="mockup-footer-label">Questions solved this week</span>
-                <span className="mockup-footer-val">+47 ↑</span>
-              </div>
-            </div>
-          </div>
+        {/* CTA buttons */}
+        <div className="hero-v2-actions fade-up delay-3">
+          <a href="/mock-interviews" className="btn btn-primary btn-lg">
+            Start Mock Interview <FiArrowRight size={16} />
+          </a>
+          <a href="/interview-questions" className="btn btn-secondary btn-lg">
+            Browse Questions
+          </a>
         </div>
 
+        {/* Technology orbit */}
+        <div className="hero-v2-techs fade-up delay-4">
+          <span className="hero-v2-techs-label">Explore Technologies</span>
+          <div className="hero-v2-tech-grid">
+            {FEATURES.map((f) => (
+              <a key={f.label} href={f.path} className="hero-v2-tech-pill">
+                {f.icon}
+                <span>{f.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

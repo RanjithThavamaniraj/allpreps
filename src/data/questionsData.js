@@ -3198,5 +3198,1605 @@ export const QUESTIONS_DATA = [
     difficulty: "hard",
     answer: "[Cloud Interconnect - HARD]\n\nIn enterprise, mission-critical scenarios, you must design for failure. Implement multi-region active-active deployments using global traffic routers. For data persistence, utilize asynchronous replication with conflict resolution. Implement stringent security using VPC peering, private endpoints, and KMS-encrypted data at rest. During incidents, rely on automated failover scripts and detailed distributed tracing to identify bottlenecks.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Interconnect.",
     command: "# Advanced multi-region setup\ngcloud compute backend-services create my-backend --global\ngcloud spanner instances create my-instance --config=regional-us-central1 --nodes=3"
+  },
+  {
+    id: 500,
+    title: "Difference between Security Groups and Network Access Control Lists (NACLs)",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Both act as firewalls but function at different layers of your Virtual Private Cloud (VPC):\n• Security Group: Operates at the instance level (EC2). It is stateful (inbound allowed traffic automatically allows outbound response). It supports ALLOW rules only.\n• Network ACL (NACL): Operates at the subnet level. It is stateless (outbound responses must be explicitly allowed by rules). It supports both ALLOW and DENY rules. Rules are processed in numerical order.",
+    command: "# Describe security groups in a specific VPC\naws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-08ac3024c125\n\n# Describe NACLs for a specific VPC\naws ec2 describe-network-acls --filters Name=vpc-id,Values=vpc-08ac3024c125"
+  },
+  {
+    id: 501,
+    title: "Explain Amazon S3 Storage Classes and lifecycle policies",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Amazon S3 offers different storage classes to optimize cost based on data access patterns:\n• S3 Standard: High durability and availability for active data.\n• S3 Standard-IA (Infrequent Access): Lower storage cost, but retrieval fee. For data accessed less than once a month.\n• S3 Glacier Flexible Retrieval: Secure, low-cost archive with retrieval times from minutes to hours.\n• S3 Glacier Deep Archive: Lowest cost storage with retrievals in 12 hours.\nLifecycle policies automate transitions between these classes (e.g. move logs to Glacier after 30 days, then delete after 90 days).",
+    command: "# Put a lifecycle configuration on an S3 bucket\naws s3api put-bucket-lifecycle-configuration \\\n  --bucket my-app-logs-bucket \\\n  --lifecycle-configuration file://lifecycle.json\n\n# Contents of lifecycle.json:\n# {\n#   \"Rules\": [\n#     {\n#       \"ID\": \"MoveLogsToGlacier\",\n#       \"Status\": \"Enabled\",\n#       \"Filter\": {\"Prefix\": \"logs/\"},\n#       \"Transitions\": [\n#         {\"Days\": 30, \"StorageClass\": \"GLACIER\"}\n#       ]\n#     }\n#   ]\n# }"
+  },
+  {
+    id: 502,
+    title: "How to configure the AWS CLI on a new system?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "To interact with AWS services from the terminal, configure your access keys. Running 'aws configure' prompts for four pieces of information:\n1. AWS Access Key ID\n2. AWS Secret Access Key\n3. Default Region Name (e.g. us-east-1)\n4. Default Output Format (json, text, or table)\nThese settings are saved in credentials and config files in ~/.aws/.",
+    command: "# Start interactive configuration\naws configure\n\n# Verify your identity and permissions\naws sts get-caller-identity\n\n# List files in the configuration directory\nls -l ~/.aws/"
+  },
+  {
+    id: 503,
+    title: "What is an Elastic IP address vs Public IP in AWS?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "• Public IP: Dynamically assigned to an EC2 instance. It changes every time the instance is stopped and started. This breaks external DNS or firewall white-lists.\n• Elastic IP (EIP): A static, public IPv4 address allocated to your AWS account. You can associate it with any EC2 instance. It remains unchanged even if the instance is stopped or restarted.",
+    command: "# Allocate an Elastic IP address in your region\naws ec2 allocate-address --domain vpc\n\n# Associate an Elastic IP with an EC2 instance\naws ec2 associate-address --instance-id i-0482ac8c21 --public-ip 54.210.14.85"
+  },
+  {
+    id: 504,
+    title: "How do you check EC2 instance status and details using AWS CLI?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Use 'aws ec2' commands to list, filter, and inspect virtual machines. Use the query parameter to return specific properties, such as IP addresses or instance states, in a clean format.",
+    command: "# List all running EC2 instances with ID and Type\naws ec2 describe-instances \\\n  --filters \"Name=instance-state-name,Values=running\" \\\n  --query \"Reservations[*].Instances[*].[InstanceId,InstanceType,PublicIpAddress]\" \\\n  --output table"
+  },
+  {
+    id: 505,
+    title: "Explain the difference between an IAM User, Group, and Role",
+    category: "aws",
+    difficulty: "easy",
+    answer: "• IAM User: An identity representing a single person or service that interacts with AWS. It has long-term credentials (password, access keys).\n• IAM Group: A collection of users. You assign permissions to a group so all members inherit them, simplifying user management.\n• IAM Role: An identity with temporary credentials. It is assumed by services (e.g. EC2) or users from other accounts, avoiding the need to hardcode credentials in applications.",
+    command: "# Create a new IAM Group\naws iam create-group --group-name DBA-Admins\n\n# Attach a policy to the group\naws iam attach-group-policy \\\n  --group-name DBA-Admins \\\n  --policy-arn arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+  },
+  {
+    id: 506,
+    title: "What is Amazon Route 53 and what are A vs CNAME records?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Amazon Route 53 is a highly available and scalable Domain Name System (DNS) service.\n• A Record (Address): Maps a domain name directly to an IPv4 address (e.g., app.com -> 54.2.14.8).\n• CNAME Record (Canonical Name): Maps a domain name to another domain name (e.g., www.app.com -> app-load-balancer-1234.us-east-1.elb.amazonaws.com). Route 53 also supports Alias records, which act like CNAMEs but route directly to AWS resources (like ELBs or S3 buckets) without incurring extra DNS query charges.",
+    command: "# List hosted zones in your Route 53 account\naws route53 list-hosted-zones\n\n# List resource record sets in a specific hosted zone\naws route53 list-resource-record-sets --hosted-zone-id Z0482937108"
+  },
+  {
+    id: 507,
+    title: "How to enable billing alerts and alarms in AWS?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "To prevent unexpected cloud bills, enable billing alerts in the Billing Console. This publishes metrics to CloudWatch in the us-east-1 region. You can then create a CloudWatch alarm to send email notifications via Simple Notification Service (SNS) when costs exceed a defined threshold.",
+    command: "# Create a CloudWatch alarm to trigger when monthly charges exceed $100\naws cloudwatch put-metric-alarm \\\n  --alarm-name \"Monthly-Budget-Alarm\" \\\n  --metric-name EstimatedCharges \\\n  --namespace AWS/Billing \\\n  --statistic Maximum \\\n  --period 21600 \\\n  --evaluation-periods 1 \\\n  --threshold 100 \\\n  --comparison-operator GreaterThanOrEqualToThreshold \\\n  --dimensions Name=Currency,Value=USD \\\n  --alarm-actions arn:aws:sns:us-east-1:123456789012:billing-alerts-topic"
+  },
+  {
+    id: 508,
+    title: "Explain the difference between a public subnet and private subnet",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Both subnets exist inside a Virtual Private Cloud (VPC) but differ in routing configuration:\n• Public Subnet: Its route table contains an entry pointing to an Internet Gateway (IGW), allowing resources inside the subnet to communicate directly with the internet.\n• Private Subnet: Its route table does not contain a path to an IGW. To download updates, resources in a private subnet route traffic through a Network Address Translation (NAT) Gateway placed in a public subnet.",
+    command: "# Describe subnets in your VPC\naws ec2 describe-subnets --filters \"Name=vpc-id,Values=vpc-08ac3024c125\""
+  },
+  {
+    id: 509,
+    title: "How to stop, start, and reboot EC2 instances using the AWS CLI?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "You can manage the lifecycle of your virtual instances using the AWS CLI. Stopping an instance stops billing for compute resources, but EBS volumes continue to incur storage fees. Rebooting performs an operating system restart without changing the underlying physical host.",
+    command: "# Stop a running EC2 instance\naws ec2 stop-instances --instance-ids i-085fac801\n\n# Start a stopped EC2 instance\naws ec2 start-instances --instance-ids i-085fac801\n\n# Reboot an instance online\naws ec2 reboot-instances --instance-ids i-085fac801"
+  },
+  {
+    id: 510,
+    title: "What is Amazon CloudWatch and what are basic vs detailed monitoring?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Amazon CloudWatch is a monitoring and management service that collects performance data and log files from AWS resources.\n• Basic Monitoring: Enabled by default for EC2 instances. It collects metrics (CPU, disk, network) at 5-minute intervals at no additional charge.\n• Detailed Monitoring: Collects metrics at 1-minute intervals for an additional charge, allowing you to react quickly to scaling events.",
+    command: "# Enable detailed monitoring on an EC2 instance\naws ec2 monitor-instances --instance-ids i-085fac801\n\n# Disable detailed monitoring (revert to basic)\naws ec2 unmonitor-instances --instance-ids i-085fac801"
+  },
+  {
+    id: 511,
+    title: "How to create an IAM role for EC2 to access S3 buckets?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "Hardcoding AWS access keys inside code running on EC2 is a major security risk. Instead, create an IAM Role with permissions to access the S3 bucket, and attach it to the EC2 instance as an Instance Profile. The AWS SDK retrieves temporary credentials automatically.",
+    command: "# Create the IAM role with trust policy (trusts EC2 service)\naws iam create-role --role-name EC2-S3-ReadOnly-Role --assume-role-policy-document file://trust_policy.json\n\n# Attach ReadOnly S3 access policy\naws iam attach-role-policy --role-name EC2-S3-ReadOnly-Role --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess\n\n# Create instance profile and associate with EC2\naws iam create-instance-profile --instance-profile-name EC2-S3-Profile\naws iam add-role-to-instance-profile --instance-profile-name EC2-S3-Profile --role-name EC2-S3-ReadOnly-Role"
+  },
+  {
+    id: 512,
+    title: "What is the AWS KMS (Key Management Service) and customer managed vs AWS managed keys?",
+    category: "aws",
+    difficulty: "easy",
+    answer: "AWS Key Management Service (KMS) manages cryptographic keys used to encrypt data at rest across AWS services (EBS, RDS, S3).\n• AWS Managed Keys: Created and managed automatically by AWS on your behalf. They are free, but their key policies cannot be modified, and they cannot be shared across AWS accounts.\n• Customer Managed Keys (CMKs): Created by you. You have full control over their key policies, rotation schedules, and cross-account access. They cost $1/key/month.",
+    command: "# List KMS keys in your AWS account\naws kms list-keys\n\n# Create a new Customer Managed Key\naws kms create-key --description \"My Database Backup Key\""
+  },
+  {
+    id: 513,
+    title: "How to configure VPC Peering between two separate Virtual Private Clouds?",
+    category: "aws",
+    difficulty: "medium",
+    answer: "VPC Peering connects two VPCs, allowing resources in either network to communicate using private IP addresses. It does not support transitive routing (e.g. if A is peered to B, and B to C, A cannot access C without a direct peer).\n\nSetup Steps:\n1. Send a Peering Connection Request from the requester VPC to the accepter VPC.\n2. Accept the Peering Request in the accepter VPC.\n3. Add routes in the route tables of both VPCs pointing to the peering connection ID (pcx-xxxx) for the destination CIDR block.",
+    command: "# Create VPC Peering connection request\naws ec2 create-vpc-peering-connection \\\n  --vpc-id vpc-01111111111111111 (Requester) \\\n  --peer-vpc-id vpc-02222222222222222 (Accepter)\n\n# Accept the peering connection request\naws ec2 accept-vpc-peering-connection \\\n  --vpc-peering-connection-id pcx-0123456789abcdef0"
+  },
+  {
+    id: 514,
+    title: "Writing a secure IAM Policy in JSON restricting S3 bucket access",
+    category: "aws",
+    difficulty: "medium",
+    answer: "IAM policies define permissions. Always write policies adhering to the Principle of Least Privilege. Specify exactly which actions are allowed on which resources, and use condition keys (like source IP addresses) to restrict access.",
+    command: "# Put a bucket policy to restrict access to a specific IP address\naws s3api put-bucket-policy --bucket secure-data-bucket --policy file://policy.json\n\n# Contents of policy.json:\n# {\n#   \"Version\": \"2012-10-17\",\n#   \"Statement\": [\n#     {\n#       \"Effect\": \"Deny\",\n#       \"Principal\": \"*\",\n#       \"Action\": \"s3:*\",\n#       \"Resource\": [\n#         \"arn:aws:s3:::secure-data-bucket\",\n#         \"arn:aws:s3:::secure-data-bucket/*\"\n#       ],\n#       \"Condition\": {\n#         \"NotIpAddress\": {\"aws:SourceIp\": \"192.168.1.0/24\"}\n#       }\n#     }\n#   ]\n# }"
+  },
+  {
+    id: 515,
+    title: "Configuring EC2 Auto Scaling Groups and scaling policies",
+    category: "aws",
+    difficulty: "medium",
+    answer: "Auto Scaling Groups (ASG) dynamically scale the number of EC2 instances up or down based on resource demands.\n\nKey parameters:\n• Launch Template: Defines the AMI, instance type, security groups, and key pairs to use when launching new instances.\n• Min, Max, and Desired Capacity: Restricts the scale limits.\n• Target Tracking Scaling Policy: Adjusts instances dynamically to keep a metric (like average CPU utilization) at a target percentage (e.g. keep CPU at 60%).",
+    command: "# Create a scaling policy using CPU target tracking\naws autoscaling put-scaling-policy \\\n  --auto-scaling-group-name my-web-asg \\\n  --policy-name cpu-60-tracking-policy \\\n  --policy-type TargetTrackingScaling \\\n  --target-tracking-configuration file://scaling_config.json\n\n# Contents of scaling_config.json:\n# {\n#   \"TargetValue\": 60.0,\n#   \"PredefinedMetricSpecification\": {\n#     \"PredefinedMetricType\": \"ASGAverageCPUUtilization\"\n#   }\n# }"
+  },
+  {
+    id: 516,
+    title: "AWS CloudFront CDN: Origin Access Control (OAC) vs Origin Access Identity (OAI)",
+    category: "aws",
+    difficulty: "medium",
+    answer: "To secure a static website hosted in S3, bypass direct public S3 URLs and force users to access the site through CloudFront. This allows you to enforce SSL, geoblocking, and caching benefits.\n\nOrigin Access Identity (OAI) vs Origin Access Control (OAC):\n• OAI: Legacy method. It restricts S3 bucket access to a specific CloudFront identity, but it does not support SSE-KMS encryption or modern S3 upload techniques.\n• OAC: Modern, recommended method. It supports KMS encryption, POST requests, and offers improved security settings.",
+    command: "# Describe CloudFront distribution details\naws cloudfront list-distributions"
+  },
+  {
+    id: 517,
+    title: "Managing secrets securely using AWS Systems Manager (SSM) Parameter Store",
+    category: "aws",
+    difficulty: "medium",
+    answer: "Avoid committing database credentials or API keys directly to git repositories. Store them securely in AWS Systems Manager (SSM) Parameter Store as SecureString parameters, encrypted using AWS KMS. Applications can retrieve them dynamically using the AWS SDK.",
+    command: "# Store database password securely in Parameter Store\naws ssm put-parameter \\\n  --name \"/prod/database/password\" \\\n  --value \"SuperSecretPassword123\" \\\n  --type \"SecureString\" \\\n  --key-id \"alias/aws/ssm\" \\\n  --overwrite\n\n# Retrieve decrypted password\naws ssm get-parameter \\\n  --name \"/prod/database/password\" \\\n  --with-decryption \\\n  --query \"Parameter.Value\" \\\n  --output text"
+  },
+  {
+    id: 518,
+    title: "How to configure S3 Bucket CORS (Cross-Origin Resource Sharing)?",
+    category: "aws",
+    difficulty: "medium",
+    answer: "Cross-Origin Resource Sharing (CORS) defines rules allowing web applications running in one domain to access assets (like images or JSON files) hosted in a different domain (an S3 bucket). By default, browsers block these cross-origin requests for security reasons.",
+    command: "# Apply CORS configuration to a bucket\naws s3api put-bucket-cors \\\n  --bucket my-assets-bucket \\\n  --cors-configuration file://cors.json\n\n# Contents of cors.json:\n# {\n#   \"CORSRules\": [\n#     {\n#       \"AllowedHeaders\": [\"*\"],\n#       \"AllowedMethods\": [\"GET\", \"HEAD\"],\n#       \"AllowedOrigins\": [\"https://my-app.com\"],\n#       \"MaxAgeSeconds\": 3000\n#     }\n#   ]\n# }"
+  },
+  {
+    id: 519,
+    title: "What is an Application Load Balancer (ALB) and path-based routing?",
+    category: "aws",
+    difficulty: "medium",
+    answer: "An Application Load Balancer (ALB) operates at Layer 7 (Application Layer) of the OSI model. It routes incoming traffic to Target Groups (instances or containers) based on request attributes, such as HTTP headers, methods, or URL paths (e.g. route /api to API servers, and /static to asset servers).",
+    command: "# Describe load balancers in your account\naws elb describe-load-balancers\n\n# List target groups configured for the load balancer\naws elds describe-target-groups"
+  },
+  {
+    id: 520,
+    title: "How to configure custom CloudWatch Alarms for EC2 Disk Space usage?",
+    category: "aws",
+    difficulty: "medium",
+    answer: "By default, AWS cannot see the internal state of your EC2 instances (such as memory usage or disk partition space) due to virtualization boundaries. To monitor these, install the CloudWatch Agent inside the EC2 operating system. The agent pushes metrics to CloudWatch, allowing you to create custom disk alarms.",
+    command: "# Put a metric alarm on a custom metric reported by the agent\naws cloudwatch put-metric-alarm \\\n  --alarm-name \"High-Disk-Usage-Alarm\" \\\n  --metric-name disk_used_percent \\\n  --namespace CWAgent \\\n  --statistic Average \\\n  --period 300 \\\n  --evaluation-periods 2 \\\n  --threshold 85 \\\n  --comparison-operator GreaterThanOrEqualToThreshold \\\n  --dimensions Name=InstanceId,Value=i-0482ac8c21 Name=path,Value=/ \\\n  --alarm-actions arn:aws:sns:us-east-1:123456789012:admin-alerts"
+  },
+  {
+    id: 521,
+    title: "Difference between NAT Gateway and NAT Instance in AWS",
+    category: "aws",
+    difficulty: "medium",
+    answer: "Both allow instances in private subnets to connect to the internet while blocking incoming connections:\n• NAT Instance: A virtual machine configured to perform NAT. It is managed by you. It does not scale automatically and represents a single point of failure unless configured in an HA pair.\n• NAT Gateway: A managed AWS service. It scales automatically, provides high availability within an AZ, and supports bandwidth up to 45 Gbps. It requires no maintenance but incurs higher hourly and data processing fees.",
+    command: "# Describe active NAT gateways in your VPC\naws ec2 describe-nat-gateways"
+  },
+  {
+    id: 522,
+    title: "DynamoDB read/write capacity modes: On-Demand vs Provisioned Capacity",
+    category: "aws",
+    difficulty: "medium",
+    answer: "DynamoDB charges based on read/write throughput and storage:\n• Provisioned Capacity Mode: You specify the exact Read Capacity Units (RCU) and Write Capacity Units (WCU) your application requires. You can configure auto-scaling. It is cost-effective for predictable workloads.\n• On-Demand Mode: DynamoDB scales throughput automatically to handle traffic spikes. You pay exactly for the requests you make (no capacity planning needed). It is best for unpredictable or low-traffic workloads.",
+    command: "# Create a DynamoDB table with Provisioned Capacity (5 RCU, 5 WCU)\naws dynamodb create-table \\\n  --table-name Users \\\n  --attribute-definitions AttributeName=UserId,AttributeType=S \\\n  --key-schema AttributeName=UserId,KeyType=HASH \\\n  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
+  },
+  {
+    id: 523,
+    title: "How to configure cross-region replication (CRR) in Amazon S3?",
+    category: "aws",
+    difficulty: "medium",
+    answer: "Cross-Region Replication (CRR) replicates S3 objects automatically from a source bucket in one region to a destination bucket in a different region. This is useful for disaster recovery or compliance requirements.\n\nPrerequisites:\n• Both source and destination buckets must have Versioning enabled.\n• An IAM Role must be configured to grant S3 permissions to replicate objects across regions.",
+    command: "# Enable versioning on source bucket\naws s3api put-bucket-versioning \\\n  --bucket source-bucket \\\n  --versioning-configuration Status=Enabled\n\n# Enable versioning on destination bucket\naws s3api put-bucket-versioning \\\n  --bucket destination-bucket \\\n  --versioning-configuration Status=Enabled"
+  },
+  {
+    id: 524,
+    title: "What is Amazon RDS database backup and retention policy management?",
+    category: "aws",
+    difficulty: "medium",
+    answer: "Amazon RDS automates database backups. By default, it takes a daily full snapshot and archives database transaction logs (transaction logs are updated every 5 minutes), allowing Point-In-Time Recovery (PITR) to any second within the retention period (default 7 days, max 35 days). Disabling backups (setting retention to 0) deletes all automated snapshots.",
+    command: "# Modify RDS instance to increase backup retention period to 14 days\naws rds modify-db-instance \\\n  --db-instance-identifier prod-db-instance \\\n  --backup-retention-period 14 \\\n  --apply-immediately"
+  },
+  {
+    id: 525,
+    title: "How do you create a new ExpressRoute resource?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[ExpressRoute - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding ExpressRoute.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 526,
+    title: "What is the primary use case for Azure Data Lake Storage?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Data Lake Storage - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Data Lake Storage.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 527,
+    title: "How can you monitor the basic metrics of ExpressRoute?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[ExpressRoute - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding ExpressRoute.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 528,
+    title: "Explain the pricing model for Azure Kubernetes Service (AKS).",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Kubernetes Service (AKS) - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Kubernetes Service (AKS).",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 529,
+    title: "How do you configure basic access for Disk Storage?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Disk Storage - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Disk Storage.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 530,
+    title: "What are the limitations of Azure Files in the free tier?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Files - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Files.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 531,
+    title: "How do you connect to a running Virtual Network (VNet) instance?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Virtual Network (VNet) - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Virtual Network (VNet).",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 532,
+    title: "What is the difference between Cosmos DB and standard alternatives?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Cosmos DB - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cosmos DB.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 533,
+    title: "How do you set up billing alerts for Azure Active Directory (AAD)?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Active Directory (AAD) - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Active Directory (AAD).",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 534,
+    title: "What are the required parameters to initialize Azure Data Lake Storage?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Data Lake Storage - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Data Lake Storage.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 535,
+    title: "How do you create a new Azure Load Balancer resource?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Load Balancer - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Load Balancer.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 536,
+    title: "What is the primary use case for Blob Storage?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Blob Storage - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Blob Storage.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 537,
+    title: "How can you monitor the basic metrics of Key Vault?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Key Vault - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Key Vault.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 538,
+    title: "Explain the pricing model for Azure Load Balancer.",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Load Balancer - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Load Balancer.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 539,
+    title: "How do you configure basic access for Azure Security Center?",
+    category: "azure",
+    difficulty: "easy",
+    answer: "[Azure Security Center - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Security Center.",
+    command: "# Example Azure CLI command\naz resource create --name MyResource --resource-group MyResourceGroup"
+  },
+  {
+    id: 540,
+    title: "How do you implement high availability for Azure Load Balancer across multiple zones?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Azure Load Balancer - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Load Balancer.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 541,
+    title: "Explain how to configure auto-scaling for Azure SQL Database based on CPU usage.",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Azure SQL Database - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure SQL Database.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 542,
+    title: "What is the best way to migrate on-premises data to Azure Active Directory (AAD) with minimal downtime?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Azure Active Directory (AAD) - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Active Directory (AAD).",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 543,
+    title: "How do you securely manage secrets and credentials when using Cosmos DB?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Cosmos DB - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cosmos DB.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 544,
+    title: "Describe the process of setting up a CI/CD pipeline targeting Azure Kubernetes Service (AKS).",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Azure Kubernetes Service (AKS) - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Kubernetes Service (AKS).",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 545,
+    title: "How can you optimize the cost of running Key Vault in production?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Key Vault - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Key Vault.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 546,
+    title: "Explain how to troubleshoot network connectivity issues with Azure Database for PostgreSQL.",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Azure Database for PostgreSQL - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Azure Database for PostgreSQL.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 547,
+    title: "How do you implement cross-region replication for Key Vault?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Key Vault - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Key Vault.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 548,
+    title: "What are the best practices for logging and auditing Blob Storage?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Blob Storage - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Blob Storage.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 549,
+    title: "How do you handle stateful workloads effectively in Virtual Machine Scale Sets?",
+    category: "azure",
+    difficulty: "medium",
+    answer: "[Virtual Machine Scale Sets - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Virtual Machine Scale Sets.",
+    command: "# Configure scaling and networking\naz monitor autoscale create --resource-group MyResourceGroup --resource MyResource\naz network vnet subnet update --vnet-name MyVNet --name MySubnet"
+  },
+  {
+    id: 550,
+    title: "What is CI/CD and what is its purpose?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "CI/CD stands for Continuous Integration and Continuous Delivery (or Deployment):\n• Continuous Integration (CI): Developers merge code changes into a central repository frequently. Each merge triggers automated builds and tests to identify bugs early.\n• Continuous Delivery/Deployment (CD): Automated release pipeline that deploys code to staging (Delivery) or directly to production (Deployment) once tests pass.\n\nPurpose: To speed up release cycles, minimize human errors, and ensure code is always in a deployable state.",
+    command: "# Simple workflow representation:\n# Git Commit -> Trigger Webhook -> Run Tests -> Build Artifact -> Scan Vulnerabilities -> Deploy to Server"
+  },
+  {
+    id: 551,
+    title: "Explain Virtualization vs Containerization",
+    category: "devops",
+    difficulty: "easy",
+    answer: "• Virtualization (VMs): Runs a full Guest OS on top of physical hardware using a Hypervisor (e.g. VMware, VirtualBox). Each VM has virtualized memory, CPU, and disk. They are heavy, slow to boot (minutes), and consume substantial resource overhead.\n• Containerization (Docker): Shares the host OS kernel and runs processes in isolated namespaces. Containers do not require a guest OS. They are extremely lightweight, boot in seconds, and share host resources efficiently.",
+    command: "# View running processes inside a container (shares host kernel but isolated)\ndocker run -d --name test-container alpine sleep 3600\ndocker top test-container"
+  },
+  {
+    id: 552,
+    title: "What is Git and explain clone vs fork vs pull?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Git is a distributed version control system to track file modifications.\n• Clone: Creates a local copy of a remote Git repository on your machine, linking your local repo back to the remote origin.\n• Fork: Creates a copy of a repository under *your* GitHub/GitLab account. You can make modifications without affecting the original project, then submit a Pull Request.\n• Pull: Fetches modifications from a remote repository and merges them into your active local branch.",
+    command: "# Clone a repository\ngit clone https://github.com/app/allpreps.git\n\n# Fetch and merge latest changes from active remote branch\ngit pull origin main"
+  },
+  {
+    id: 553,
+    title: "What is Infrastructure as Code (IaC) and what are its benefits?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Infrastructure as Code (IaC) is the practice of managing and provisioning infrastructure (VPCs, servers, databases, DNS) using machine-readable configuration files (like Terraform, CloudFormation, Ansible) instead of manual console actions.\n\nBenefits:\n• Consistency: Eliminates configuration drift.\n• Version Control: Infrastructure definitions can be committed to Git, reviewed, and rolled back.\n• Automation: Spawns complex infrastructures in minutes.",
+    command: "# Example of declarative Terraform resource definition\n# resource \"aws_instance\" \"app_server\" {\n#   ami           = \"ami-085fac801\"\n#   instance_type = \"t3.micro\"\n# }"
+  },
+  {
+    id: 554,
+    title: "Explain the difference between YAML and JSON syntax rules",
+    category: "devops",
+    difficulty: "easy",
+    answer: "YAML and JSON are serialization languages commonly used for config files (YAML for Kubernetes/Ansible/pipelines, JSON for APIs/Terraform states):\n• YAML: Uses indentation (spaces, never tabs) for structure. It is highly human-readable, supports comments (#), and has no brackets or braces.\n• JSON: Uses curly braces {} for objects, square brackets [] for arrays, and colons for key-value maps. Keys must be double-quoted. It does not support comments and is less human-readable.",
+    command: "# YAML representation:\ndatabase:\n  host: dbhost\n  port: 5432\n\n# JSON equivalent:\n# {\n#   \"database\": {\n#     \"host\": \"dbhost\",\n#     \"port\": 5432\n#   }\n# }"
+  },
+  {
+    id: 555,
+    title: "What is a Dockerfile and explain its basic commands?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "A Dockerfile is a text document containing instructions to build a Docker image:\n• FROM: Sets the base image (e.g. ubuntu, alpine, node).\n• RUN: Runs a command during the image build phase (installs packages).\n• COPY: Copies local files from host machine to the image filesystem.\n• CMD: Specifies the default command to execute when the container starts.",
+    command: "# Create a simple Dockerfile\ncat << 'EOF' > Dockerfile\nFROM alpine:3.18\nRUN apk add --no-cache curl\nCOPY app.sh /app.sh\nCMD [\"sh\", \"/app.sh\"]\nEOF"
+  },
+  {
+    id: 556,
+    title: "How do you list, stop, and remove Docker containers from the CLI?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Docker provides CLI commands to manage container lifecycles:\n• docker ps: Lists running containers.\n• docker ps -a: Lists *all* containers (running and stopped).\n• docker stop [ID/Name]: Gracefully terminates a running container (SIGTERM).\n• docker rm [ID/Name]: Deletes a stopped container.\n• docker kill [ID/Name]: Forcefully kills a container (SIGKILL).",
+    command: "# List active containers\ndocker ps\n\n# Stop a container named 'my-web-app'\ndocker stop my-web-app\n\n# Delete the stopped container\ndocker rm my-web-app\n\n# Delete all stopped containers at once\ndocker container prune -f"
+  },
+  {
+    id: 557,
+    title: "What is Kubernetes (K8s) and what is a Pod?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Kubernetes is an open-source container orchestration platform designed to automate deploying, scaling, and managing containerized applications.\n\n• Pod: The smallest deployable unit in Kubernetes. A Pod hosts one or more containers (usually just one) that share network interfaces, storage volumes, and IP addresses. Containers within a Pod communicate using localhost.",
+    command: "# List active pods in default namespace\nkubectl get pods\n\n# Describe details of a specific pod\nkubectl describe pod my-app-pod"
+  },
+  {
+    id: 558,
+    title: "What is a Jenkinsfile and explain declarative vs scripted pipeline syntax?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "A Jenkinsfile is a text file that contains the definition of a Jenkins Pipeline and is committed to source control.\n• Declarative Pipeline: Uses a structured, pre-defined format (stages, step, agent) which is easier to write and read. It has built-in syntax validation.\n• Scripted Pipeline: Uses Groovy script code. It is highly flexible but complex to write and maintain.",
+    command: "# Minimal Declarative Pipeline structure:\n# pipeline {\n#   agent any\n#   stages {\n#     stage('Test') {\n#       steps { sh 'npm test' }\n#     }\n#   }\n# }"
+  },
+  {
+    id: 559,
+    title: "What is Prometheus and Grafana in DevOps monitoring?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Prometheus and Grafana are open-source tools used for system observability:\n• Prometheus: A time-series database and monitoring tool. It pulls (scrapes) numeric metrics from targets at regular intervals, evaluates rule expressions, and triggers alerts.\n• Grafana: A visualization platform. It connects to Prometheus (and other databases) to build rich, interactive dashboards displaying graphs, CPU/Memory charts, and server statuses.",
+    command: "# Check active Prometheus config file\n# cat /etc/prometheus/prometheus.yml"
+  },
+  {
+    id: 560,
+    title: "Explain Git branching strategy: Gitflow vs Trunk-Based Development",
+    category: "devops",
+    difficulty: "easy",
+    answer: "• Gitflow: Multi-branch strategy. Developers work on 'feature' branches, merge to 'develop', release via 'release' branches, and merge to 'main' for production. It is highly controlled but slow and creates merge debt.\n• Trunk-Based Development: Modern CI/CD practice. Developers merge small, frequent commits into a single central branch ('trunk' or 'main') daily. Feature flags are used to hide incomplete features. It accelerates CI/CD pipelines.",
+    command: "# Trunk-based simple flow:\n# git checkout main\n# git pull\n# git checkout -b feat/add-login\n# (write code) -> commit -> merge directly to main"
+  },
+  {
+    id: 561,
+    title: "Explain the difference between Docker CMD and ENTRYPOINT instructions",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Both define the execution command of a container, but interact differently when arguments are passed at runtime:\n• ENTRYPOINT: Configures the container to run as an executable. It cannot be overridden by standard docker run arguments (unless using --entrypoint).\n• CMD: Defines default arguments or commands. It can be easily overridden by appending commands to `docker run`.\nIf combined, CMD acts as default parameters appended to the ENTRYPOINT command.",
+    command: "# In Dockerfile:\n# ENTRYPOINT [\"ping\"]\n# CMD [\"8.8.8.8\"]\n\n# Running container without args pings 8.8.8.8:\n# docker run my-ping-image\n\n# Running with args overrides CMD, pinging 1.1.1.1 instead:\n# docker run my-ping-image 1.1.1.1"
+  },
+  {
+    id: 562,
+    title: "What is Ansible and what is a Playbook?",
+    category: "devops",
+    difficulty: "easy",
+    answer: "Ansible is an open-source, agentless configuration management tool. It connects to remote hosts over SSH (or WinRM) to install software, modify configurations, and manage user accounts.\n\n• Playbook: A YAML file containing one or more 'plays'. Each play defines the target host group and a sequential list of 'tasks' (e.g. install Nginx, copy config, start service) using built-in Ansible modules.",
+    command: "# Execute an Ansible Playbook\nansible-playbook -i inventory.ini deploy_web.yml"
+  },
+  {
+    id: 563,
+    title: "Explain Microservices architecture vs Monolithic",
+    category: "devops",
+    difficulty: "easy",
+    answer: "• Monolithic Architecture: The entire application (UI, business logic, database access) is built, packaged, and deployed as a single unit. It is simple to develop but hard to scale, scale limits block progress, and a single bug can crash the entire system.\n• Microservices Architecture: The application is split into small, independent services (e.g. payment service, user service) communicating via lightweight protocols (REST, gRPC, message queues). Each service has its own database, can be written in different languages, and scales independently.",
+    command: "# Microservices layout:\n# UI Gateway -> Auth Service (DB1) & Payment Service (DB2) & Email Queue"
+  },
+  {
+    id: 564,
+    title: "Explain Kubernetes Services: ClusterIP vs NodePort vs LoadBalancer",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Kubernetes Pods are ephemeral (they die and get recreated with new IP addresses). Services provide a stable network endpoint to route traffic to active Pods:\n• ClusterIP (Default): Exposes the service on a private internal cluster IP. It is accessible only from inside the Kubernetes cluster.\n• NodePort: Exposes the service on a static port (30000-32767) on each Node's IP. External traffic can access the service by calling Node_IP:NodePort.\n• LoadBalancer: Integrates with cloud providers (AWS, GCP) to automatically provision a public-facing cloud load balancer routing directly to NodePorts.",
+    command: "# Expose a deployment named 'my-web' via NodePort\nkubectl expose deployment my-web --type=NodePort --port=80 --target-port=8080\n\n# Get service status and exposed ports\nkubectl get svc"
+  },
+  {
+    id: 565,
+    title: "How do you optimize Docker image sizes using multi-stage builds?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Standard Docker builds package compilers, test tools, and source code into the final image, bloating sizes (e.g. Node SDK is 1GB+). Multi-stage builds use multiple FROM instructions in a single Dockerfile. You compile code in a heavy 'build' stage, and then copy *only* the compiled binary/dist folder into a lightweight 'runtime' stage (e.g., alpine or distroless), stripping out compilers and source code.",
+    command: "# Build stage\nFROM node:18-alpine AS builder\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nRUN npm run build\n\n# Runtime stage\nFROM nginx:alpine\nCOPY --from=builder /app/dist /usr/share/nginx/html\nEXPOSE 80"
+  },
+  {
+    id: 566,
+    title: "What is Docker Volume and difference between bind mount vs named volume?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "By default, files created inside a container are ephemeral and get deleted when the container exits. Volumes persist container data outside the container filesystem:\n• Bind Mount: Maps a specific, absolute path on the host system to a path inside the container. Best for local development (syncing code changes instantly).\n• Named Volume: Managed entirely by Docker. Docker stores the data in a dedicated folder (/var/lib/docker/volumes/) on the host. Best for production databases and backups since it prevents host OS directory conflicts.",
+    command: "# Run container with a bind mount\ndocker run -d -v /home/user/project:/app node:18\n\n# Run container with a named volume (created if missing)\ndocker run -d -v db_data:/var/lib/postgresql/data postgres:15-alpine"
+  },
+  {
+    id: 567,
+    title: "How to manage Kubernetes configurations using ConfigMaps and Secrets?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Decoupling config parameters from container images ensures portability across Dev, Staging, and Prod environments:\n• ConfigMap: Stores non-sensitive, plain-text key-value configurations (database hostnames, ports, environment flags).\n• Secret: Stores sensitive configurations (passwords, tokens, API keys) encoded in Base64. Secrets are stored in temp memory (tmpfs) on nodes, protecting them from disk exposure.\nBoth can be loaded as environment variables or mounted as files inside pods.",
+    command: "# Create a ConfigMap from a literal value\nkubectl create configmap app-config --from-literal=DB_HOST=pgdb.local\n\n# Create a Secret\nkubectl create secret generic db-credentials --from-literal=password=SuperSecret\n\n# View secret (returns Base64 encoded value)\nkubectl get secret db-credentials -o yaml"
+  },
+  {
+    id: 568,
+    title: "Explain Blue-Green deployment vs Canary deployment strategies",
+    category: "devops",
+    difficulty: "medium",
+    answer: "• Blue-Green Deployment: You maintain two identical environments. Blue is active (production), Green is standby. You deploy the new release to Green, run integration tests, and then swap router DNS/load balancer targets to point to Green. It provides instant rollback but is expensive as it requires doubling resource footprints.\n• Canary Deployment: You deploy the new release to a small subset of instances (e.g. 5% of traffic). You monitor error rates, CPU usage, and user behavior. If stable, you roll it out to 100% of servers. It minimizes blast radius of bugs.",
+    command: "# Routing swap representation:\n# Router -> Blue (v1.0)\n# (Deploy v2.0 to Green) -> (Tests Pass) -> Swap Router to Green (v2.0)"
+  },
+  {
+    id: 569,
+    title: "What is Git merge vs rebase, and when should you use which?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Both integrate commits from one branch into another:\n• Merge: Creates a new 'merge commit' combining the histories of both branches. It preserves the exact chronological history of work but can clutter the git tree with merge commits.\n• Rebase: Rewrites commits from the feature branch on top of the target branch's latest commit. It creates a clean, linear commit history, but it alters commit hashes. Rule of thumb: Never rebase public shared branches; only rebase local private branches to clean up work before merging.",
+    command: "# Rebase feature branch on top of main\ngit checkout feature-login\ngit rebase main\n\n# If conflicts, resolve and run:\ngit rebase --continue"
+  },
+  {
+    id: 570,
+    title: "How do you handle secrets securely in Jenkins/GitHub Actions pipelines?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Hardcoding passwords or SSH keys in pipeline scripts or committing them to git is a critical vulnerability. Instead:\n• GitHub Actions: Save secrets in Repository Settings under 'Secrets and variables'. Reference them in YAML as `${{ secrets.SECRET_NAME }}`. GitHub masks these values in console outputs automatically.\n• Jenkins: Save secrets in the Credentials Manager. Bind credentials to environment variables using the `withCredentials` block in Jenkinsfiles.",
+    command: "# In GitHub Actions pipeline YAML:\n# steps:\n#   - name: Deploy to Docker Hub\n#     env:\n#       DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}\n#     run: echo \"$DOCKER_PASSWORD\" | docker login -u user --password-stdin"
+  },
+  {
+    id: 571,
+    title: "What is Terraform state file and why is remote state locking important?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Terraform saves the configuration mappings and metadata of the resources it manages to a local file called `terraform.tfstate`.\n\nRemote State and Locking:\n• Committing state to git exposes sensitive parameters (passwords are stored in plain text in the state file).\n• In a team, if two developers run `terraform apply` concurrently, it can lead to state corruption or duplicate resources.\n• Fix: Store the state file in a remote backend (e.g. S3) and configure remote locking using a database (e.g. DynamoDB) to lock access during runs.",
+    command: "# Terraform backend configuration block:\n# terraform {\n#   backend \"s3\" {\n#     bucket         = \"prod-terraform-state-bucket\"\n#     key            = \"vpc/terraform.tfstate\"\n#     dynamodb_table = \"terraform-locks\"\n#   }\n# }"
+  },
+  {
+    id: 572,
+    title: "What is Ansible Inventory and dynamic inventories?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "• Ansible Inventory: A file (INI or YAML format) listing the hostnames, IP addresses, and group structures of target servers that Ansible connects to.\n• Dynamic Inventory: In cloud environments (AWS, GCP), instances scale up and down, changing IP addresses constantly, making static files obsolete. A dynamic inventory is an Ansible plugin/script that queries cloud API endpoints to automatically resolve and group hosts based on tags (e.g. environment:production).",
+    command: "# Static Inventory (inventory.ini):\n# [web_servers]\n# 192.168.1.15 ansible_user=deploy\n# 192.168.1.16 ansible_user=deploy\n\n# Using AWS dynamic inventory plugin (aws_ec2):\n# ansible-playbook -i aws_ec2.yml deploy_web.yml"
+  },
+  {
+    id: 573,
+    title: "Explain Kubernetes ReplicaSet vs Deployment vs StatefulSet",
+    category: "devops",
+    difficulty: "medium",
+    answer: "• ReplicaSet: Ensures a specified number of identical Pod replicas are running at all times. It replaces pods if they crash.\n• Deployment: Wraps around ReplicaSets. It provides declarative updates for Pods (rolling updates, rollbacks) and handles updates automatically.\n• StatefulSet: Used for stateful applications (databases like Postgres or Cassandra). Unlike deployments where pods have random names (app-58da-21), StatefulSet Pods have static, ordinal names (db-0, db-1). They maintain persistent volume mappings and scale in a strict sequential order.",
+    command: "# Scale a deployment to 5 replicas\nkubectl scale deployment my-web-app --replicas=5\n\n# View StatefulSet pods (ordered ordinal IDs)\nkubectl get pods -l app=database"
+  },
+  {
+    id: 574,
+    title: "How to implement log aggregation using the ELK Stack?",
+    category: "devops",
+    difficulty: "medium",
+    answer: "Log files scattered across hundreds of servers are difficult to search. The ELK Stack provides centralized log aggregation:\n• Filebeat/Logstash: Agents collect logs from servers and parse them.\n• Elasticsearch: A search engine that indexes and stores logs.\n• Kibana: A web interface to search logs using query expressions.",
+    command: "# Search logs dynamically in elasticsearch via REST API\ncurl -X GET \"localhost:9200/nginx-logs/_search?q=status:500&pretty\""
+  },
+  {
+    id: 575,
+    title: "How do you create a new Google Kubernetes Engine (GKE) resource?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Google Kubernetes Engine (GKE) - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Google Kubernetes Engine (GKE).",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 576,
+    title: "What is the primary use case for Persistent Disk?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Persistent Disk - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Persistent Disk.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 577,
+    title: "How can you monitor the basic metrics of App Engine?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[App Engine - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding App Engine.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 578,
+    title: "Explain the pricing model for Cloud Run.",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud Run - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Run.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 579,
+    title: "How do you configure basic access for Cloud Storage?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud Storage - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Storage.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 580,
+    title: "What are the limitations of Persistent Disk in the free tier?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Persistent Disk - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Persistent Disk.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 581,
+    title: "How do you connect to a running Filestore instance?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Filestore - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Filestore.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 582,
+    title: "What is the difference between Security Command Center and standard alternatives?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Security Command Center - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Security Command Center.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 583,
+    title: "How do you set up billing alerts for VPC Network?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[VPC Network - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding VPC Network.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 584,
+    title: "What are the required parameters to initialize Cloud Spanner?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud Spanner - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Spanner.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 585,
+    title: "How do you create a new Cloud Run resource?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud Run - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Run.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 586,
+    title: "What is the primary use case for Bigtable?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Bigtable - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Bigtable.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 587,
+    title: "How can you monitor the basic metrics of Cloud Functions?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud Functions - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Functions.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 588,
+    title: "Explain the pricing model for Cloud DNS.",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud DNS - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud DNS.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 589,
+    title: "How do you configure basic access for Cloud Spanner?",
+    category: "google",
+    difficulty: "easy",
+    answer: "[Cloud Spanner - EASY]\n\nTo use this resource effectively, you typically start by navigating to the console or using the CLI. Ensure that your IAM permissions are correctly configured. Basic monitoring can be done via the default metrics dashboard. It is designed to be fully managed, allowing you to focus on application logic rather than infrastructure maintenance.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud Spanner.",
+    command: "# Example gcloud command\ngcloud compute instances create my-instance --zone=us-central1-a"
+  },
+  {
+    id: 590,
+    title: "How do you implement high availability for Cloud SQL across multiple zones?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Cloud SQL - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud SQL.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 591,
+    title: "Explain how to configure auto-scaling for VPC Service Controls based on CPU usage.",
+    category: "google",
+    difficulty: "medium",
+    answer: "[VPC Service Controls - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding VPC Service Controls.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 592,
+    title: "What is the best way to migrate on-premises data to Bigtable with minimal downtime?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Bigtable - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Bigtable.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 593,
+    title: "How do you securely manage secrets and credentials when using Filestore?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Filestore - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Filestore.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 594,
+    title: "Describe the process of setting up a CI/CD pipeline targeting Cloud DNS.",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Cloud DNS - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud DNS.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 595,
+    title: "How can you optimize the cost of running Filestore in production?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Filestore - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Filestore.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 596,
+    title: "Explain how to troubleshoot network connectivity issues with VPC Network.",
+    category: "google",
+    difficulty: "medium",
+    answer: "[VPC Network - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding VPC Network.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 597,
+    title: "How do you implement cross-region replication for Cloud IAM?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Cloud IAM - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud IAM.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 598,
+    title: "What are the best practices for logging and auditing Filestore?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Filestore - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Filestore.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 599,
+    title: "How do you handle stateful workloads effectively in Cloud IAM?",
+    category: "google",
+    difficulty: "medium",
+    answer: "[Cloud IAM - MEDIUM]\n\nFor intermediate usage, you must consider automated scaling and robust networking. Implementing Health Checks and configuring Load Balancing is critical. Use infrastructure as code (like Terraform) to deploy these resources predictably. Ensure that proper subnetting and firewall rules are established to prevent unauthorized access while allowing necessary internal traffic.\n\nAlways ensure you consult the official documentation for the latest best practices regarding Cloud IAM.",
+    command: "# Configure scaling and networking\ngcloud compute instance-groups managed set-autoscaling my-group --max-num-replicas=10\ngcloud compute firewall-rules create allow-internal"
+  },
+  {
+    id: 600,
+    title: "How to check Linux OS distribution name and kernel version?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "You can find the Linux operating system distribution and kernel release version using built-in system files or terminal tools:\n• /etc/os-release: Standard file containing OS identification data.\n• uname -r: Returns the running kernel release version.\n• hostnamectl: Displays OS, kernel, and system architecture details.",
+    command: "# View operating system details\ncat /etc/os-release\n\n# Print kernel release version\nuname -r\n\n# Display system information overview\nhostnamectl"
+  },
+  {
+    id: 601,
+    title: "How do you find files larger than 100MB in a directory?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "The 'find' command searches the directory hierarchy for files matching specific size criteria. Using options like '-type f' limits the search to regular files, and '-size' filters by size. Running it with 'ls' or 'du' formats the output to show exact sizes.",
+    command: "# Find and list files larger than 100MB in /var/log\nfind /var/log -type f -size +100M -exec ls -lh {} \\;\n\n# Search current directory recursively for files > 100MB\nfind . -type f -size +100M"
+  },
+  {
+    id: 602,
+    title: "Explain the difference between soft links and hard links in Linux",
+    category: "linux",
+    difficulty: "easy",
+    answer: "• Soft Link (Symlink): A symbolic path pointing to another filename. If the original file is deleted, the symlink becomes broken ('dangling'). It can span across different filesystems.\n• Hard Link: An additional directory entry pointing directly to the file's underlying inode. If the original filename is deleted, the file content remains accessible via the hard link. It cannot span across different filesystems or point to directories.",
+    command: "# Create a soft link (symlink)\nln -s /etc/nginx/nginx.conf ~/my_nginx.conf\n\n# Create a hard link\nln /var/log/messages ~/messages_backup\n\n# View inodes to verify (hard links share the same inode number)\nls -li"
+  },
+  {
+    id: 603,
+    title: "How do you check which process is listening on port 80 or 443?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "To troubleshoot connection errors or find port conflicts, use utilities like 'ss', 'netstat', or 'lsof'. You typically need superuser privileges to see the process name and PID.",
+    command: "# Using ss (socket statistics) - Recommended\nsudo ss -tulpn | grep -E ':80|:443'\n\n# Using lsof (list open files)\nsudo lsof -i :80\n\n# Using netstat\nsudo netstat -tulpn | grep -E ':80|:443'"
+  },
+  {
+    id: 604,
+    title: "How to change file permissions and ownership in Linux?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "• chmod: Modifies file permissions using symbolic representation (e.g. u+x) or octal notation (e.g. 755).\n• chown: Modifies file owner and group ownership.\nUse the '-R' option with either command to apply the changes recursively to all subdirectories.",
+    command: "# Set owner read/write/execute, group/others read/execute (755)\nchmod 755 /var/www/html/index.html\n\n# Make a script executable\nchmod +x deploy.sh\n\n# Change owner to 'oracle' and group to 'oinstall' recursively\nsudo chown -R oracle:oinstall /u01/app/oracle"
+  },
+  {
+    id: 605,
+    title: "How to view and search compressed log files without extracting them?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "Linux systems rotate logs and compress them using gzip (.gz format). You can search or view these logs directly without manually decompressing them using 'z-commands':\n• zcat: Concat and view files.\n• zless / zmore: Paginate through text.\n• zgrep: Search for patterns.",
+    command: "# Search for ORA- errors inside compressed log archives\nzgrep \"ORA-\" /var/log/oracle/alert_log.*.gz\n\n# Page through a compressed log file\nzless /var/log/nginx/access.log.2.gz"
+  },
+  {
+    id: 606,
+    title: "How to check system uptime and load average?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "Load average represents the average system load over a period of time (1, 5, and 15 minutes). It counts the number of processes in runnable or uninterruptible sleep states.\n• uptime: Shows uptime, active sessions, and load averages.\n• w: Shows who is logged in and what they are doing.",
+    command: "# Check uptime and load averages\nuptime\n\n# View active user sessions and load averages\nw"
+  },
+  {
+    id: 607,
+    title: "How do you kill a process by its name instead of PID?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "While 'kill' requires a process ID (PID), you can terminate processes by name using:\n• killall: Kills all processes matching the exact name.\n• pkill: Kills processes matching a pattern.\n• pgrep: Lists PIDs matching a process name.",
+    command: "# Find PIDs of all running Nginx instances\npgrep nginx\n\n# Terminate all processes named 'httpd' gracefully (SIGTERM)\npkill httpd\n\n# Forcefully kill all processes named 'node' (SIGKILL)\nkillall -9 node"
+  },
+  {
+    id: 608,
+    title: "How do you search for a pattern in all files within a directory?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "Use 'grep' with recursive flags. Useful options include:\n• -r or -R: Recursive search.\n• -n: Show line numbers.\n• -i: Case-insensitive search.\n• -w: Match whole words only.",
+    command: "# Search for 'localhost' in all files under /etc\ngrep -rn \"localhost\" /etc/\n\n# Case-insensitive search for 'error' in /var/log\ngrep -ri \"error\" /var/log/"
+  },
+  {
+    id: 609,
+    title: "How do you monitor log updates live in color using tail?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "You can follow file updates live with 'tail -f'. To highlight specific words like 'ERROR' or 'WARNING' in color, pipe the output to grep or use utilities like 'grc' or 'multitail'.",
+    command: "# Follow log files live\ntail -f /var/log/nginx/error.log\n\n# Color highlight 'ERROR' using grep\ntail -f /var/log/syslog | grep --color=auto -iE 'error|warning|critical'"
+  },
+  {
+    id: 610,
+    title: "How to check available disk space on all mounted filesystems?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "Use the 'df' command. The '-h' flag prints the capacity in human-readable units (e.g. GB, MB), and '-T' displays the filesystem type (ext4, xfs, nfs).",
+    command: "# Display disk space in human-readable format\ndf -h\n\n# Display disk space with filesystem types\ndf -hT"
+  },
+  {
+    id: 611,
+    title: "How to manage system services using systemctl?",
+    category: "linux",
+    difficulty: "easy",
+    answer: "Modern Linux distributions use systemd to manage services. The 'systemctl' tool controls the status, startup, and shutdown behavior of system units.",
+    command: "# Check status of SSH service\nsystemctl status sshd\n\n# Start, stop, or restart a service\nsudo systemctl start nginx\nsudo systemctl stop nginx\nsudo systemctl restart nginx\n\n# Enable service to start automatically on system boot\nsudo systemctl enable docker"
+  },
+  {
+    id: 612,
+    title: "How do you diagnose and resolve inode exhaustion?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "An inode represents a metadata record for a file. If a filesystem runs out of inodes, you cannot create new files, even if there is plenty of raw disk space available. This commonly occurs when an application creates millions of tiny session files or mail queues.\n\nResolution steps:\n1. Check inode consumption using `df -i`.\n2. Find the directories containing the highest number of files.\n3. Delete the unnecessary small files using `find -delete` or `xargs` (since running `rm *` will fail with 'Argument list too long').",
+    command: "# Check inode availability per filesystem\ndf -i\n\n# Find directories with high file counts\nfind / -xdev -type d -exec sh -c 'echo \"$(find \"$1\" -type f | wc -l) $1\"' _ {} \\; | sort -rn | head -10\n\n# Delete millions of tiny files safely without memory overflow\nfind /var/spool/postfix/maildrop -type f -delete"
+  },
+  {
+    id: 613,
+    title: "How to add and enable swap space dynamically on a running system?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "If physical RAM is fully utilized, the system may invoke the Out-Of-Memory (OOM) killer to terminate database or application processes. You can dynamically create swap space using a swap file without resizing partitions.\n\nSteps:\n1. Allocate a blank file of the desired size using `dd` or `fallocate`.\n2. Set correct root-only permissions (600).\n3. Format the file as swap space using `mkswap`.\n4. Enable it using `swapon`.\n5. Append it to `/etc/fstab` for persistence.",
+    command: "# Create a 4GB swap file\nsudo fallocate -l 4G /swapfile\n\n# Set correct permissions\nsudo chmod 600 /swapfile\n\n# Format the file as swap\nsudo mkswap /swapfile\n\n# Enable the swap file\nsudo swapon /swapfile\n\n# Verify active swap spaces\nswapon --show\n\n# Persist in fstab\necho '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab"
+  },
+  {
+    id: 614,
+    title: "How to configure visudo to grant passwordless permissions to a specific user?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Directly editing `/etc/sudoers` can lock you out of system administration if a syntax error is introduced. Always use the `visudo` command, which validates configuration syntax before saving.\n\nConfiguration format:\n`username host=(runas_user:runas_group) [NOPASSWD:] commands`",
+    command: "# Open sudoers file in safe edit mode\nsudo visudo\n\n# Add this line to allow user 'dba' to run systemctl restart database passwordless:\n# dba ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart oracle-xe\n\n# Add this line to allow user 'deploy' to run all commands without password:\n# deploy ALL=(ALL) NOPASSWD: ALL"
+  },
+  {
+    id: 615,
+    title: "Explain Linux systemd custom unit file creation and management",
+    category: "linux",
+    difficulty: "medium",
+    answer: "A systemd unit file (.service) configures how systemd manages a daemon. It is typically created in `/etc/systemd/system/`.\n\nKey sections:\n• [Unit]: Description and boot dependency orders (After=network.target).\n• [Service]: Command to execute (ExecStart), restart policy (Restart=always), and run user/group constraints.\n• [Install]: Activation targets (WantedBy=multi-user.target).",
+    command: "# Create custom service file\nsudo cat << 'EOF' > /etc/systemd/system/myapp.service\n[Unit]\nDescription=My NodeJS App Service\nAfter=network.target\n\n[Service]\nUser=node\nWorkingDirectory=/var/www/myapp\nExecStart=/usr/bin/node server.js\nRestart=always\n\n[Install]\nWantedBy=multi-user.target\nEOF\n\n# Reload systemd configuration\nsudo systemctl daemon-reload\n\n# Start and enable the service\nsudo systemctl start myapp\nsudo systemctl enable myapp"
+  },
+  {
+    id: 616,
+    title: "How to diagnose slow disk performance and write bottlenecks?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Disk I/O latency can degrade database throughput. Diagnose storage bottlenecks using:\n• iostat: Checks CPU statistics and I/O statistics for devices. Pay attention to '%util' (disk utilization) and 'await' (average I/O response time in milliseconds).\n• iotop: Shows real-time disk I/O usage per process, identifying which process is writing heavily.",
+    command: "# Run iostat every 2 seconds, displaying detailed disk extended statistics\niostat -x 2 5\n\n# View processes actively performing read/write operations\nsudo iotop -o"
+  },
+  {
+    id: 617,
+    title: "Configuring logrotate to manage growing application logs",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Logrotate automatically rotates, compresses, and purges log files to prevent partition exhaustion. It is controlled by config scripts under `/etc/logrotate.d/`.\n\nCommon options:\n• daily/weekly/monthly: Rotation frequency.\n• rotate count: How many archived files to keep.\n• compress: Compress logs using gzip.\n• missingok: Skip without error if the log file is missing.\n• delaycompress: Postpone compression until the next rotation cycle.",
+    command: "# Create custom logrotate configuration for an app\nsudo cat << 'EOF' > /etc/logrotate.d/myapp\n/var/log/myapp/*.log {\n    daily\n    rotate 7\n    compress\n    delaycompress\n    missingok\n    notifempty\n    create 0660 app_user app_group\n    sharedscripts\n    postrotate\n        /usr/bin/systemctl reload myapp > /dev/null 2>&1\n    endscript\n}\nEOF\n\n# Force test run logrotate execution manually\nsudo logrotate -f /etc/logrotate.d/myapp"
+  },
+  {
+    id: 618,
+    title: "How to resolve 'Too many open files' errors on Linux?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "The kernel limits the number of file descriptors a process can open (typically 1024 for non-root users). Under high concurrent load, web servers or databases will crash with a 'Too many open files' error.\n\nResolution steps:\n1. Check current limits using `ulimit -n`.\n2. Monitor open file descriptors using `lsof`.\n3. Modify system-wide and user limits in `/etc/security/limits.conf`.",
+    command: "# Check active shell open file descriptor limits\nulimit -n\n\n# Count open files for a specific PID\nlsof -p 2481 | wc -l\n\n# Add limits permanently in /etc/security/limits.conf:\n# oracle   soft   nofile   65536\n# oracle   hard   nofile   65536"
+  },
+  {
+    id: 619,
+    title: "How do you run commands in the background that survive terminal disconnection?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Standard shell processes terminate if the SSH connection drops. To run tasks that persist:\n• screen / tmux: Virtual terminal multiplexers that run sessions independently of SSH status.\n• nohup: Executes a command, ignoring hangup signals (SIGHUP), redirecting output to nohup.out.\n• bg/fg/jobs: Built-in shell job control.",
+    command: "# Run a background backup job that persists after exit\nnohup /u01/app/oracle/scripts/backup.sh > /tmp/backup.log 2>&1 &\n\n# Start a tmux session\ntmux new -s db_restore\n\n# Detach from tmux: press Ctrl+B, then D\n# Re-attach to tmux later:\ntmux attach -t db_restore"
+  },
+  {
+    id: 620,
+    title: "How to configure system clock sync using chrony?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Database replication, Active Directory, and log analysis require precise clock synchronization across nodes. Chrony is the modern NTP implementation used to sync system time with reliable internet time servers.\n\nManagement steps:\n• Configure NTP pool servers in `/etc/chrony.conf`.\n• Manage chronyd daemon.\n• Validate sync status using `chronyc`.",
+    command: "# Check chrony clock synchronization details\nchronyc tracking\n\n# List configured NTP servers and check their connectivity status\nchronyc sources -v\n\n# Force step the system clock immediately if time offset is large\nsudo chronyc -a makestep"
+  },
+  {
+    id: 621,
+    title: "How to secure network connections in Linux using firewalld?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Firewalld is a firewall management tool that dynamically manages network ports. It uses Zones (e.g. public, internal) to classify network traffic.\n\nSteps:\n1. Add a port or service rule.\n2. Reload configuration to apply.\n3. Verify open configurations.",
+    command: "# Add Oracle listener port (1521) permanently to public zone\nsudo firewall-cmd --zone=public --add-port=1521/tcp --permanent\n\n# Reload firewall rules\nsudo firewall-cmd --reload\n\n# List active firewall rules in default zone\nsudo firewall-cmd --list-all"
+  },
+  {
+    id: 622,
+    title: "Using rsync to synchronize directories across servers securely",
+    category: "linux",
+    difficulty: "medium",
+    answer: "Rsync is a fast, file-copying tool that syncs directories over SSH. It uses an delta-transfer algorithm, copying only the differences between source and destination files to reduce network bandwidth.\n\nKey flags:\n• -a: Archive mode (preserves permissions, ownership, timestamps, and symlinks).\n• -v: Verbose output.\n• -z: Compress data during transfer.\n• --delete: Deletes files in destination that no longer exist in source.",
+    command: "# Sync local backup directory to a backup server over SSH\nrsync -avz --delete /u01/backups/ backup_user@bkpserver:/storage/backups/\n\n# Perform a dry run to see changes without copying\nrsync -avz --dry-run /u01/backups/ backup_user@bkpserver:/storage/backups/"
+  },
+  {
+    id: 623,
+    title: "How to examine kernel rings and system event buffers using dmesg?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "The 'dmesg' command prints the kernel message buffer. It is a critical diagnostic tool for identifying hardware errors, driver issues, memory errors (OOM kills), or block layer issues.",
+    command: "# Search kernel logs for Out-Of-Memory events\ndmesg -T | grep -i oom\n\n# Search for disk I/O or SCSI connection errors\ndmesg -T | grep -iE 'sd|scsi|block|error'\n\n# View live kernel logs\ndmesg -w"
+  },
+  {
+    id: 624,
+    title: "How do you audit directory disk space usage using du and ncdu?",
+    category: "linux",
+    difficulty: "medium",
+    answer: "When a partition fills up, you must identify what files are consuming space. Use 'du' with sort filters, or the interactive command-line analyzer 'ncdu'.",
+    command: "# Find top 10 largest folders under /var/log\nsudo du -ah /var/log/ | sort -rh | head -n 10\n\n# Run interactive disk usage analyzer (if installed)\nncdu /var"
+  },
+  {
+    id: 625,
+    title: "How to read command-line arguments in a Bash script?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Bash scripts can accept command-line arguments. These are automatically assigned to positional parameters:\n• $1, $2, $3...: First, second, third arguments.\n• $0: The name of the script itself.\n• $#: The number of arguments passed.\n• $@: All positional parameters as separate words (preferred over $*).\n• $*: All positional parameters as a single word.",
+    command: "# Create a script to print arguments\ncat << 'EOF' > arg_test.sh\n#!/bin/bash\necho \"Script Name: $0\"\necho \"Total Arguments: $#\"\necho \"First Arg: $1\"\necho \"Second Arg: $2\"\necho \"All Args (List): $@\"\nEOF\n\nchmod +x arg_test.sh\n./arg_test.sh param1 param2"
+  },
+  {
+    id: 626,
+    title: "How to check if a file or directory exists using if conditions?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "You can perform file testing checks inside conditional brackets [ ] or [[ ]]:\n• -f file: True if the file exists and is a regular file.\n• -d dir: True if the directory exists.\n• -e path: True if the path exists (regardless of type).\n• -r path: True if readable.\n• -w path: True if writable.",
+    command: "# Check if /etc/hosts exists and is a file\nif [ -f \"/etc/hosts\" ]; then\n  echo \"/etc/hosts exists.\"\nfi\n\n# Check if backup directory exists, create if missing\nBACKUP_DIR=\"/tmp/backup\"\nif [ ! -d \"$BACKUP_DIR\" ]; then\n  mkdir -p \"$BACKUP_DIR\"\nfi"
+  },
+  {
+    id: 627,
+    title: "Explain exit status codes ($?) and how to use them for error handling?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Every Linux command returns an exit status code (0 to 255) upon completion:\n• 0: Success.\n• Non-Zero (1-255): Failure or specific error state.\n\nYou can query this status code using the special variable '$?' immediately after running a command, or evaluate it in conditionals.",
+    command: "# Ping a server and check if it is online\nping -c 1 -W 2 google.com > /dev/null 2>&1\nSTATUS=$?\n\nif [ $STATUS -eq 0 ]; then\n  echo \"Internet connection active.\"\nelse\n  echo \"Network ping failed with exit code $STATUS.\"\nfi"
+  },
+  {
+    id: 628,
+    title: "How to loop through all files in a directory using a for loop?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "You can iterate over files in a directory using globbing patterns (e.g., *) in a for loop. Avoid using the output of `ls` in loops, as filenames containing spaces can break parsing.",
+    command: "# Loop through all .log files in /var/log/nginx/\nfor file in /var/log/nginx/*.log; do\n  # Check if file exists to handle empty directories safely\n  [ -e \"$file\" ] || continue\n  echo \"Processing log file: $(basename \"$file\")\"\ndone"
+  },
+  {
+    id: 629,
+    title: "How to perform basic arithmetic operations in Bash?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Bash only supports integer arithmetic. You can perform arithmetic calculations using:\n• $(( expression )): The modern double-parentheses syntax (preferred).\n• let statement: Performs variable assignment.\n• expr command: Legacy syntax (slower, requires spaces).",
+    command: "# Calculate sum using double-parentheses\nnum1=15\nnum2=20\nsum=$((num1 + num2))\necho \"Sum: $sum\"\n\n# Increment a variable\ncount=1\n((count++))\necho \"Incremented Count: $count\"\n\n# Multiplication\nproduct=$((num1 * num2))\necho \"Product: $product\""
+  },
+  {
+    id: 630,
+    title: "How to redirect messages to standard error (stderr) instead of stdout?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "By default, 'echo' writes to standard output (file descriptor 1). To write error messages to standard error (file descriptor 2) so they can be separated during logging, redirect the output of echo using '>&2'.",
+    command: "# Print standard output message\necho \"This is standard output.\"\n\n# Print error message to stderr\necho \"ERROR: Database connection failed!\" >&2\n\n# Running script while routing errors to a log file:\n# ./my_script.sh 2> errors.log"
+  },
+  {
+    id: 631,
+    title: "How to read user input interactively in a Bash script?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Use the built-in `read` command to pause execution and capture input from the user.\nUseful options:\n• -p \"Prompt\": Displays a prompt text without a newline.\n• -s: Silent mode (does not echo input characters, useful for passwords).\n• -t seconds: Timeout limit.",
+    command: "# Ask for username\nread -p \"Enter Database Username: \" db_user\n\n# Ask for password silently\nread -s -p \"Enter Database Password: \" db_pass\necho \"\" # Print newline after password mask\n\necho \"Connecting to DB as user $db_user...\""
+  },
+  {
+    id: 632,
+    title: "Explain the difference between single quotes, double quotes, and backticks in Bash",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "• Single Quotes ('...'): Strong quoting. Treats every character literally. No variable expansion or command substitution occurs.\n• Double Quotes (\"...\"): Weak quoting. Resolves variables ($var) and command substitutions ($(command)), but treats spaces literally.\n• Backticks (`...`): Legacy command substitution. Runs the command inside and returns its output (use $(command) instead for nested queries).",
+    command: "NAME=\"Oracle\"\n\n# Single quotes (Literal text output)\necho 'Database name is $NAME' # Output: Database name is $NAME\n\n# Double quotes (Variable expanded)\necho \"Database name is $NAME\" # Output: Database name is Oracle\n\n# Command substitution\nCURRENT_DIR=$(pwd)\necho \"Current path is: $CURRENT_DIR\""
+  },
+  {
+    id: 633,
+    title: "How to redirect stdout and stderr to a log file?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Redirection manages where standard streams go:\n• > log.txt: Redirects stdout to a file (overwriting).\n• >> log.txt: Appends stdout to a file.\n• 2> err.txt: Redirects stderr to a file.\n• &> log.txt: Redirects BOTH stdout and stderr to a file (modern).\n• > log.txt 2>&1: Legacy redirect of both streams (redirects stdout to file, then stderr to stdout).",
+    command: "# Run backup script and redirect all outputs (overwrite)\n/opt/db_backup.sh &> /var/log/db_backup.log\n\n# Run cleanup script and append logs, sending errors to a separate file\n/opt/cleanup.sh >> /var/log/cleanup.log 2>> /var/log/cleanup_errors.log"
+  },
+  {
+    id: 634,
+    title: "How to concatenate strings and get the length of a string in Bash?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "• Concatenation: Simply place variables next to each other, optionally wrapping them in braces ${var} to avoid character ambiguity.\n• String Length: Use the syntax ${#varname} to return the character count of a string variable.",
+    command: "prefix=\"db_backup_\"\ndate_suffix=\"2026-05-21\"\n\n# Concatenate strings\nfile_name=\"${prefix}${date_suffix}.dmp\"\necho \"Target File: $file_name\"\n\n# Get string length\nlength=${#file_name}\necho \"Filename Length: $length characters\""
+  },
+  {
+    id: 635,
+    title: "How to check if a string contains a substring in Bash?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "You can check for substrings inside double brackets [[ ]] using wildcard globbing patterns (e.g. *pattern*), or by using the case statement.",
+    command: "DB_URL=\"jdbc:postgresql://dbhost:5432/production\"\n\n# Check substring using double brackets and glob matching\nif [[ \"$DB_URL\" == *\"postgresql\"* ]]; then\n  echo \"Database type identified as PostgreSQL.\"\nfi\n\n# Alternate search using case\ncase \"$DB_URL\" in\n  *oracle*) echo \"Oracle database detected\" ;;\n  *postgresql*) echo \"Postgres database detected\" ;;\n  *) echo \"Unknown database\" ;;\nesac"
+  },
+  {
+    id: 636,
+    title: "How to use command substitution ( $(command) ) in Bash?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Command substitution runs a specified command in a subshell and assigns its standard output to a variable or passes it inline. The modern syntax is `$(command)`, replacing the legacy backticks ``command`` syntax because it supports easy nesting.",
+    command: "# Assign command output to a variable\nCURRENT_USER=$(whoami)\nSERVER_IP=$(hostname -I | awk '{print $1}')\n\necho \"Running audit on host $SERVER_IP as user $CURRENT_USER.\"\n\n# Nested command substitution\nARCHIVE_SIZE=$(du -sh \"$(find /var/log -type f -name '*.gz' | head -n 1)\" | awk '{print $1}')\necho \"Size of first log archive: $ARCHIVE_SIZE\""
+  },
+  {
+    id: 637,
+    title: "How to define and call basic functions in a Bash script?",
+    category: "shell scripting",
+    difficulty: "easy",
+    answer: "Functions modularize code. Define them using `function_name() { ... }` or `function function_name { ... }`.\n\nKey rules:\n• Functions must be defined *before* they are called.\n• Pass arguments like standard scripts ($1, $2).\n• Localize variables inside functions using the 'local' keyword to prevent global scope contamination.",
+    command: "# Define a function to log messages with timestamps\nlog_message() {\n  local log_level=$1\n  local message=$2\n  echo \"$(date '+%Y-%m-%d %H:%M:%S') [$log_level] $message\"\n}\n\n# Call the function with arguments\nlog_message \"INFO\" \"Starting database validation process.\"\nlog_message \"WARNING\" \"Free space on /u01 is low.\""
+  },
+  {
+    id: 638,
+    title: "How to read a file line by line in Bash using a while loop?",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "To read a text file line-by-line safely, combine a `while read -r` loop with input redirection. The `-r` option prevents backslash character escapes from being interpreted. Clearing the Internal Field Separator (IFS=) prevents leading/trailing whitespace trimming.",
+    command: "# Read database server IP list from a config file\nCONFIG_FILE=\"/tmp/servers.txt\"\necho -e \"10.0.1.5\\n10.0.1.6\\n10.0.1.7\" > \"$CONFIG_FILE\"\n\nwhile IFS= read -r line; do\n  # Skip empty lines or commented lines\n  [[ -z \"$line\" || \"$line\" =~ ^# ]] && continue\n  echo \"Checking node connection to: $line\"\n  ssh -o ConnectTimeout=2 \"admin@$line\" \"uptime\" < /dev/null\ndone < \"$CONFIG_FILE\""
+  },
+  {
+    id: 639,
+    title: "Handling options and flags in shell scripts using getopts",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "The built-in `getopts` utility parses command-line flags and options in a loop. It supports single-character flags (e.g. -f, -v). A colon after a flag letter indicates that the option requires an argument (stored in $OPTARG).",
+    command: "# Parse script configurations\nwhile getopts \"h:p:v\" opt; do\n  case \"$opt\" in\n    h) HOST=\"$OPTARG\" ;;\n    p) PORT=\"$OPTARG\" ;;\n    v) VERBOSE=true ;;\n    *) echo \"Invalid option\" ;;\n  esac\ndone\n\necho \"Configured host: $HOST, port: $PORT, verbose: ${VERBOSE:-false}\""
+  },
+  {
+    id: 640,
+    title: "How to debug a shell script using bash shell options?",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "To diagnose issues in complex scripts, enable bash debugging settings at the top of your script using 'set':\n• set -x: Prints every command before executing it (execution trace).\n• set -e: Terminates the script immediately if any command fails (non-zero status).\n• set -u: Terminates script if an unbound/undefined variable is evaluated.\n• set -o pipefail: Returns the exit status of the first failed command in a pipeline.",
+    command: "#!/bin/bash\n# Enable strict debugging settings\nset -euo pipefail\nset -x\n\n# This failed command will stop the script immediately due to 'set -e'\nls /non_existent_folder\n\necho \"This line will never execute.\""
+  },
+  {
+    id: 641,
+    title: "Dynamic temporary file creation using mktemp and cleanup using trap",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "Hardcoding temporary file paths (like /tmp/output.txt) can lead to file clashes or security risks. Use `mktemp` to create secure, unique temp files. To ensure these files are cleaned up if the script crashes or completes, bind a cleanup function using the `trap` command.",
+    command: "# Create a secure temporary file\nTEMP_FILE=$(mktemp /tmp/db_audit.XXXXXX)\n\n# Define cleanup action\ncleanup() {\n  echo \"Cleaning up temp files...\"\n  rm -f \"$TEMP_FILE\"\n}\n\n# Trap signals (Exit, Interrupt, Terminate)\ntrap cleanup EXIT INT TERM\n\n# Execute operations using the secure temp file\necho \"Running query...\" > \"$TEMP_FILE\"\ncat \"$TEMP_FILE\""
+  },
+  {
+    id: 642,
+    title: "String manipulation and substring extraction in Bash without external tools",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "Bash has powerful built-in parameter expansion patterns. This is far faster than invoking external tools like `sed`, `awk`, or `cut` in loops:\n• ${var#pattern}: Removes shortest match of pattern from start.\n• ${var##pattern}: Removes longest match of pattern from start.\n• ${var%pattern}: Removes shortest match of pattern from end.\n• ${var%%pattern}: Removes longest match of pattern from end.\n• ${var/pattern/replacement}: Replaces first match.\n• ${var//pattern/replacement}: Replaces all matches.",
+    command: "FILE_PATH=\"/var/log/oracle/alert_DBA.log\"\n\n# Extract directory path (remove everything after last slash)\nDIR_PATH=\"${FILE_PATH%/*}\"\necho \"Dir: $DIR_PATH\" # /var/log/oracle\n\n# Extract filename (remove everything before last slash)\nFILE_NAME=\"${FILE_PATH##*/}\"\necho \"File: $FILE_NAME\" # alert_DBA.log\n\n# Extract file extension\nEXT=\"${FILE_NAME##*.}\"\necho \"Ext: $EXT\" # log"
+  },
+  {
+    id: 643,
+    title: "How to check if a command exists in the system path before executing it?",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "Before calling external tools (like `jq`, `git`, or `docker`), check if they are installed. Avoid parsing `which`, as it acts inconsistently across Linux distros. Instead, use the shell built-in commands `command -v`, `type`, or `hash`.",
+    command: "# Check if jq is installed in the system path\nif ! command -v jq &> /dev/null; then\n  echo \"ERROR: 'jq' utility is not installed. Exiting.\" >&2\n  exit 1\nfi\n\n# Safe to proceed with jq commands\necho '{\"status\":\"ok\"}' | jq .status"
+  },
+  {
+    id: 644,
+    title: "Working with indexed arrays in Bash",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "Bash supports 1-dimensional indexed arrays. You can declare and manipulate them using standard array syntax:\n• Declare: `declare -a my_array` or `my_array=(val1 val2 val3)`.\n• Access item: `${my_array[index]}`.\n• Access all items: `${my_array[@]}`.\n• Array size: `${#my_array[@]}`.\n• Append item: `my_array+=(\"new_val\")`.",
+    command: "# Define array of target databases\ndatabases=(\"prod_db\" \"uat_db\" \"test_db\")\n\n# Append a database\ndatabases+=(\"dev_db\")\n\n# Print array size\necho \"Total DBs to backup: ${#databases[@]}\"\n\n# Iterate through the array\nfor db in \"${databases[@]}\"; do\n  echo \"Running RMAN backup for $db...\"\ndone"
+  },
+  {
+    id: 645,
+    title: "How to perform floating point arithmetic in Bash using bc?",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "Since Bash only supports integers (e.g. 5/2 = 2), you must delegate floating-point operations to an external utility like `bc` (Basic Calculator) using piping. Use the 'scale' parameter in bc to define decimal precision.",
+    command: "# Divide 5 by 2 with 2 decimal precision\nresult=$(echo \"scale=2; 5 / 2\" | bc)\necho \"Result: $result\" # 2.50\n\n# Perform complex float calculations dynamically\nused_mem=15420\ntotal_mem=16384\npct_mem=$(echo \"scale=4; ($used_mem / $total_mem) * 100\" | bc)\necho \"Memory consumption percentage: $pct_mem%\""
+  },
+  {
+    id: 646,
+    title: "Pattern matching and replacement in files using sed in-place",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "`sed` (Stream Editor) modifies text dynamically. Use the `-i` option to modify the target file directly (in-place) without redirects. In macOS, `sed -i ''` is required, while Linux accepts `sed -i`.",
+    command: "# Create configuration file\necho \"port = 8080\" > /tmp/app.conf\necho \"db_host = localhost\" >> /tmp/app.conf\n\n# Replace 'localhost' with '10.0.1.25' in-place\nsed -i 's/localhost/10.0.1.25/g' /tmp/app.conf\n\n# Replace port 8080 with 443\nsed -i 's/port = 8080/port = 443/g' /tmp/app.conf\n\ncat /tmp/app.conf"
+  },
+  {
+    id: 647,
+    title: "Extracting columns and formatting report text using awk",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "`awk` is a text-processing utility designed for data extraction. By default, it splits lines into positional variables ($1, $2...) based on whitespace fields. Use the `-F` flag to change the field separator (e.g. colon for /etc/passwd).",
+    command: "# Get usernames and home paths of system accounts (split by colon)\nawk -F: '$3 >= 1000 {print \"User: \" $1 \"\\tHome: \" $6}' /etc/passwd\n\n# Calculate the total memory size of all files listed by ls -l\nls -l | awk '{sum += $5} END {print \"Total Size: \" sum / 1024 / 1024 \" MB\"}'"
+  },
+  {
+    id: 648,
+    title: "How to set script timeout and kill hung processes in Bash?",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "To prevent automation scripts from hanging indefinitely on network calls or stuck database connections, wrap the process in a timeout threshold using the Linux `timeout` command, which sends SIGTERM or SIGKILL if the process exceeds the time limit.",
+    command: "# Run backup script with 10 seconds timeout limit\ntimeout 10s rsync -avz /data/ backup_user@remotehost:/storage/\nSTATUS=$?\n\nif [ $STATUS -eq 124 ]; then\n  echo \"ERROR: Backup timed out after 10 seconds.\" >&2\nelse\n  echo \"Backup finished with status $STATUS.\"\nfi"
+  },
+  {
+    id: 649,
+    title: "Using the select statement to build interactive text-based menus",
+    category: "shell scripting",
+    difficulty: "medium",
+    answer: "The `select` statement is a bash built-in loop that creates dynamic text-based menus. It displays a list of options with numeric indices, prompts the user (using the PS3 string), and stores the user's choice in a variable.",
+    command: "# Configure prompt message\nPS3=\"Select a DBA action: \"\n\nselect opt in \"Start Database\" \"Stop Database\" \"Check Status\" \"Exit\"; do\n  case \"$opt\" in\n    \"Start Database\") echo \"Initializing startup...\" ;;\n    \"Stop Database\") echo \"Shutting down...\" ;;\n    \"Check Status\") uptime ;;\n    \"Exit\") break ;;\n    *) echo \"Invalid option $REPLY\" ;;\n  esac\ndone"
+  },
+  {
+    id: 650,
+    title: "How to handle NULL values in SQL using COALESCE?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "NULL indicates a missing or unknown value in a database. Direct comparisons like '= NULL' will fail. The COALESCE function returns the first non-null expression from a list of arguments, making it perfect for setting default values.",
+    command: "-- Return 'N/A' if the phone number is NULL\nSELECT employee_id, first_name, COALESCE(phone_number, 'N/A') AS contact_phone\nFROM employees;\n\n-- Retrieve first non-null contact info (mobile, then home, then work)\nSELECT first_name, COALESCE(mobile_phone, home_phone, work_phone, 'No Contact') AS primary_phone\nFROM customers;"
+  },
+  {
+    id: 651,
+    title: "Difference between LEFT JOIN, RIGHT JOIN, and INNER JOIN",
+    category: "sql",
+    difficulty: "easy",
+    answer: "• INNER JOIN: Returns rows when there is a match in both tables.\n• LEFT JOIN (or LEFT OUTER JOIN): Returns all rows from the left table, and matched rows from the right table. If no match is found, NULL is returned for right-side columns.\n• RIGHT JOIN (or RIGHT OUTER JOIN): Returns all rows from the right table, and matched rows from the left table. (Generally avoided; prefer LEFT JOIN for consistency).",
+    command: "-- INNER JOIN (Only returns employees with departments)\nSELECT e.first_name, d.department_name\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.department_id;\n\n-- LEFT JOIN (Returns all employees, even those without a department)\nSELECT e.first_name, d.department_name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.department_id;"
+  },
+  {
+    id: 652,
+    title: "How to use GROUP BY with HAVING to filter aggregated results?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "• WHERE: Filters rows *before* aggregation takes place.\n• HAVING: Filters groups *after* aggregation (GROUP BY) takes place.\nYou cannot use aggregate functions (like COUNT, SUM) in a WHERE clause; you must use HAVING.",
+    command: "-- Find departments with an average salary greater than $10,000\nSELECT department_id, AVG(salary) AS avg_salary\nFROM employees\nGROUP BY department_id\nHAVING AVG(salary) > 10000;"
+  },
+  {
+    id: 653,
+    title: "How to retrieve unique rows from a query using DISTINCT?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "The DISTINCT keyword is placed immediately after SELECT to filter out duplicate rows from the result set. It evaluates the combination of all selected columns to determine uniqueness.",
+    command: "-- Get a list of all unique departments that have active employees\nSELECT DISTINCT department_id\nFROM employees\nWHERE status = 'ACTIVE';"
+  },
+  {
+    id: 654,
+    title: "How to perform wild card searches in SQL using LIKE?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "The LIKE operator filters rows matching string patterns. It uses wildcards:\n• %: Represents zero, one, or multiple characters.\n• _: Represents exactly one character.\nFor case-insensitive searches in some databases, use ILIKE or UPPER/LOWER.",
+    command: "# Search for emails ending with '@gmail.com'\nSELECT first_name, email\nFROM users\nWHERE email LIKE '%@gmail.com';\n\n# Search for names where the second letter is 'a'\nSELECT first_name\nFROM users\nWHERE first_name LIKE '_a%';"
+  },
+  {
+    id: 655,
+    title: "What is a primary key vs foreign key?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "• Primary Key (PK): A column (or set of columns) that uniquely identifies each row in a table. It cannot contain NULL values and must be unique.\n• Foreign Key (FK): A column in one table that links to the Primary Key of another table. It enforces referential integrity, ensuring you cannot insert orphan records.",
+    command: "-- Table definition with PK and FK\nCREATE TABLE departments (\n  dept_id INT PRIMARY KEY,\n  dept_name VARCHAR(50)\n);\n\nCREATE TABLE employees (\n  emp_id INT PRIMARY KEY,\n  first_name VARCHAR(50),\n  dept_id INT,\n  FOREIGN KEY (dept_id) REFERENCES departments(dept_id)\n);"
+  },
+  {
+    id: 656,
+    title: "How to update values in a table using UPDATE and WHERE?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "The UPDATE statement modifies existing records. Always include a WHERE clause; omitting the WHERE clause updates *all* rows in the table.",
+    command: "-- Update a user's email address by user ID\nUPDATE users\nSET email = 'new_email@company.com'\nWHERE user_id = 104;\n\n-- Give all employees in department 10 a 5% raise\nUPDATE employees\nSET salary = salary * 1.05\nWHERE department_id = 10;"
+  },
+  {
+    id: 657,
+    title: "How to safely delete rows from a table using DELETE vs TRUNCATE?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "• DELETE: A DML operation that removes specific rows matching a WHERE clause. It logs each row deletion, supports rollback, and fires triggers. It is slower.\n• TRUNCATE: A DDL operation that removes all rows from a table by deallocating data pages. It is faster, uses minimal log space, cannot be rolled back in some databases, and does not fire triggers.",
+    command: "-- Delete specific rows (can be rolled back)\nDELETE FROM activity_logs\nWHERE log_date < '2025-01-01';\n\n-- Truncate entire table (fast, deallocates pages)\nTRUNCATE TABLE temp_staging_data;"
+  },
+  {
+    id: 658,
+    title: "How do you count rows in a table using COUNT(*) vs COUNT(column)?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "• COUNT(*): Counts the total number of rows in the query result, including rows with NULL values.\n• COUNT(column): Counts only rows where the specified column contains a non-null value.",
+    command: "-- Total rows (e.g. 100 rows)\nSELECT COUNT(*) FROM employees;\n\n-- Non-null phone numbers (e.g. 85 rows if 15 are NULL)\nSELECT COUNT(phone_number) FROM employees;"
+  },
+  {
+    id: 659,
+    title: "How to limit query results and implement pagination in SQL?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "To return a subset of rows (e.g., for paginated pages), use LIMIT and OFFSET (PostgreSQL, MySQL) or FETCH NEXT ROWS (Oracle, SQL Server).",
+    command: "-- MySQL/PostgreSQL: Get the first 10 rows\nSELECT id, title FROM questions LIMIT 10;\n\n-- Get rows 11 to 20 (page 2)\nSELECT id, title FROM questions LIMIT 10 OFFSET 10;\n\n-- Oracle standard syntax:\n-- SELECT id, title FROM questions FETCH FIRST 10 ROWS ONLY;"
+  },
+  {
+    id: 660,
+    title: "How to use CASE WHEN statements for conditional logic in SQL?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "The CASE expression provides conditional logic (if-then-else) inline in SQL queries. It evaluates conditions and returns a value when a match is found.",
+    command: "-- Label salaries as High, Medium, or Low\nSELECT first_name, salary,\n       CASE \n         WHEN salary >= 10000 THEN 'High'\n         WHEN salary >= 5000 THEN 'Medium'\n         ELSE 'Low'\n       END AS salary_bracket\nFROM employees;"
+  },
+  {
+    id: 661,
+    title: "What is the difference between WHERE and HAVING?",
+    category: "sql",
+    difficulty: "easy",
+    answer: "• WHERE: Filters records *before* any groupings are created. It cannot reference aggregate functions.\n• HAVING: Filters records *after* GROUP BY groupings are formed. It must reference aggregated values.",
+    command: "-- Filtering rows before grouping (WHERE)\nSELECT job_id, COUNT(*) \nFROM employees \nWHERE salary > 5000 \nGROUP BY job_id;\n\n-- Filtering groups after aggregation (HAVING)\nSELECT job_id, COUNT(*)\nFROM employees\nGROUP BY job_id\nHAVING COUNT(*) > 5;"
+  },
+  {
+    id: 662,
+    title: "Explain SQL Window Functions: ROW_NUMBER, RANK, and DENSE_RANK",
+    category: "sql",
+    difficulty: "medium",
+    answer: "Window functions perform calculations across a set of table rows related to the current row, without collapsing them into a single row (unlike GROUP BY).\n\nKey Differences:\n• ROW_NUMBER(): Assigns a unique sequential integer to each row. In case of ties, it assigns numbers arbitrarily.\n• RANK(): Assigns rank with gaps. If two rows tie for 1st, they both get 1, and the next row gets 3.\n• DENSE_RANK(): Assigns rank without gaps. If two rows tie for 1st, they both get 1, and the next row gets 2.",
+    command: "-- Calculate rank of employee salaries within each department\nSELECT department_id, first_name, salary,\n       ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY salary DESC) AS row_num,\n       RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rnk,\n       DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS dense_rnk\nFROM employees;"
+  },
+  {
+    id: 663,
+    title: "Using LEAD and LAG to calculate differences between consecutive rows",
+    category: "sql",
+    difficulty: "medium",
+    answer: "LEAD and LAG are window functions that allow accessing data from other rows relative to the current row without using a self-join:\n• LAG(column, offset): Returns the column value from 'offset' rows prior.\n• LEAD(column, offset): Returns the column value from 'offset' rows ahead.\n\nThis is useful for calculating period-over-period growth or time-series changes.",
+    command: "-- Compare monthly sales with the previous month's sales\nSELECT sales_month, total_revenue,\n       LAG(total_revenue, 1) OVER (ORDER BY sales_month) AS prev_month_revenue,\n       total_revenue - LAG(total_revenue, 1) OVER (ORDER BY sales_month) AS monthly_revenue_change\nFROM monthly_sales;"
+  },
+  {
+    id: 664,
+    title: "What is database normalization? Explain 1NF, 2NF, and 3NF",
+    category: "sql",
+    difficulty: "medium",
+    answer: "Normalization organizes table structures to minimize data redundancy and prevent insertion, update, and deletion anomalies.\n\nNormalization stages:\n• 1st Normal Form (1NF): Column values must be atomic (no arrays/comma-separated lists) and rows must be unique.\n• 2nd Normal Form (2NF): Must be in 1NF, and all non-key columns must depend completely on the primary key (no partial dependencies on composite keys).\n• 3rd Normal Form (3NF): Must be in 2NF, and non-key columns must not depend on other non-key columns (no transitive dependencies).",
+    command: "-- Example of converting 2NF to 3NF:\n-- Violates 3NF: (emp_id [PK] -> dept_id -> dept_name)\n-- Fix: Split into two tables:\nCREATE TABLE depts (\n  dept_id INT PRIMARY KEY,\n  dept_name VARCHAR(50)\n);\n\nCREATE TABLE emps (\n  emp_id INT PRIMARY KEY,\n  first_name VARCHAR(50),\n  dept_id INT REFERENCES depts(dept_id)\n);"
+  },
+  {
+    id: 665,
+    title: "Explain CTEs (Common Table Expressions) and their benefits over nested subqueries",
+    category: "sql",
+    difficulty: "medium",
+    answer: "A Common Table Expression (CTE) is a temporary result set defined using a 'WITH' clause. It improves readability, modularizes complex query blocks, and can be referenced multiple times within a single query.",
+    command: "-- Modular query using CTE\nWITH dept_costs AS (\n  SELECT department_id, SUM(salary) AS total_dept_salary\n  FROM employees\n  GROUP BY department_id\n),\ncompany_avg AS (\n  SELECT AVG(total_dept_salary) AS avg_dept_salary\n  FROM dept_costs\n)\nSELECT d.department_id, d.total_dept_salary\nFROM dept_costs d, company_avg c\nWHERE d.total_dept_salary > c.avg_dept_salary;"
+  },
+  {
+    id: 666,
+    title: "How do you identify and kill blocking queries in PostgreSQL?",
+    category: "sql",
+    difficulty: "medium",
+    answer: "Locks prevent concurrent data updates from clashing. However, uncommitted transactions or heavy queries can hold locks indefinitely, blocking other operations.\n\nResolution:\n1. Query the 'pg_stat_activity' catalog view to identify blocking and blocked queries.\n2. Terminate the blocking backend process using pg_terminate_backend.",
+    command: "-- Find queries waiting for locks and the blockers holding them\nSELECT blocked_locks.pid     AS blocked_pid,\n       blocked_activity.query  AS blocked_statement,\n       blocking_locks.pid    AS blocking_pid,\n       blocking_activity.query AS blocking_statement\nFROM  pg_catalog.pg_locks         blocked_locks\nJOIN pg_catalog.pg_stat_activity blocked_activity ON blocked_activity.pid = blocked_locks.pid\nJOIN pg_catalog.pg_locks         blocking_locks \n  ON blocking_locks.locktype = blocked_locks.locktype\n  AND blocking_locks.database IS NOT DISTINCT FROM blocked_locks.database\n  AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation\n  AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page\n  AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple\n  AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid\n  AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid\n  AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid\n  AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid\n  AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid\n  AND blocking_locks.pid != blocked_locks.pid\nJOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid\nWHERE NOT blocked_locks.granted;\n\n-- Terminate blocking process PID gracefully\nSELECT pg_cancel_backend(blocking_pid);\n\n-- Forcefully terminate process PID\nSELECT pg_terminate_backend(blocking_pid);"
+  },
+  {
+    id: 667,
+    title: "What are ACID properties in database transactions?",
+    category: "sql",
+    difficulty: "medium",
+    answer: "ACID defines the key properties required to guarantee database transaction reliability:\n• Atomicity: Entire transaction completes successfully, or all changes are rolled back (All-or-Nothing).\n• Consistency: Database transitions from one valid state to another, maintaining all constraints, triggers, and schemas.\n• Isolation: Transactions running concurrently execute independently without interfering with each other.\n• Durability: Once a transaction commits, its modifications are permanently recorded in non-volatile memory (surviving system crashes).",
+    command: "-- Example of ensuring Atomicity using Transaction Block\nBEGIN TRANSACTION;\n  UPDATE bank_accounts SET balance = balance - 500 WHERE account_id = 10;\n  UPDATE bank_accounts SET balance = balance + 500 WHERE account_id = 11;\nCOMMIT; -- If either statement fails, execute ROLLBACK;"
+  },
+  {
+    id: 668,
+    title: "Difference between clustered index, non-clustered index, and covering index",
+    category: "sql",
+    difficulty: "medium",
+    answer: "• Clustered Index: Sorts and stores the physical data rows of the table based on key values. A table can have only one clustered index.\n• Non-Clustered Index: Maintains a separate structure containing key values and pointers (ROWIDs or primary keys) back to the actual data rows.\n• Covering Index: A non-clustered index that includes/covers *all* columns requested by a SELECT query. Since the index holds all requested data, the query planner can return results directly from the index tree, skipping the expensive table lookup step (index-only scan).",
+    command: "-- Create covering index (index includes filter and select columns)\nCREATE INDEX idx_emp_dept_salary ON employees(department_id, salary, employee_id);\n\n-- This query performs an index-only scan (no table blocks accessed)\nSELECT department_id, employee_id\nFROM employees\nWHERE department_id = 20;"
+  },
+  {
+    id: 669,
+    title: "How to use Self-Joins to compare rows within the same table?",
+    category: "sql",
+    difficulty: "medium",
+    answer: "A self-join is a standard join that links a table to itself. This requires assigning distinct aliases to the table in the FROM clause. It is used to query hierarchical data (e.g. employee-manager links) or compare records in the same table.",
+    command: "-- Find employees and their managers from a single employees table\nSELECT e.first_name AS employee,\n       m.first_name AS manager\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.employee_id;"
+  },
+  {
+    id: 670,
+    title: "How do you implement Upsert operations (INSERT ON CONFLICT/MERGE)?",
+    category: "sql",
+    difficulty: "medium",
+    answer: "An 'Upsert' operation inserts a new row, or updates the existing row if it violates a uniqueness constraint (like a Primary Key duplicate).\n• PostgreSQL: INSERT ON CONFLICT DO UPDATE\n• MySQL: INSERT ... ON DUPLICATE KEY UPDATE\n• SQL Standard / Oracle: MERGE",
+    command: "-- PostgreSQL Upsert (inserts new user, updates active timestamp on duplicate)\nINSERT INTO user_sessions (user_id, token, last_active)\nVALUES (105, 'xyz123', NOW())\nON CONFLICT (user_id)\nDO UPDATE SET last_active = EXCLUDED.last_active, token = EXCLUDED.token;\n\n-- MySQL Upsert\nINSERT INTO user_sessions (user_id, token, last_active)\nVALUES (105, 'xyz123', NOW())\nON DUPLICATE KEY UPDATE token = VALUES(token), last_active = VALUES(last_active);"
+  },
+  {
+    id: 671,
+    title: "Explain the difference between correlated and uncorrelated subqueries",
+    category: "sql",
+    difficulty: "medium",
+    answer: "• Uncorrelated Subquery: Executes independently of the outer query. It runs once, returns a result set, and the outer query uses that result.\n• Correlated Subquery: References columns from the outer query. It must execute repeatedly, once for every candidate row evaluated by the outer query. These are typically slower and should be replaced with JOINs or CTEs where possible.",
+    command: "-- Uncorrelated: Subquery runs once\nSELECT first_name, salary \nFROM employees \nWHERE salary > (SELECT AVG(salary) FROM employees);\n\n-- Correlated: Subquery runs once for EVERY employee row to check their department average\nSELECT e1.first_name, e1.salary, e1.department_id\nFROM employees e1\nWHERE e1.salary > (\n  SELECT AVG(e2.salary) \n  FROM employees e2 \n  WHERE e2.department_id = e1.department_id\n);"
+  },
+  {
+    id: 672,
+    title: "What are Foreign Key constraints and cascading actions?",
+    category: "sql",
+    difficulty: "medium",
+    answer: "Foreign Keys enforce referential integrity between tables. When a referenced parent row is updated or deleted, you can configure cascading actions to define what happens to child rows:\n• ON DELETE CASCADE: Deletes child rows automatically when the parent row is deleted.\n• ON DELETE SET NULL: Sets child foreign key columns to NULL.\n• ON DELETE RESTRICT / NO ACTION: Blocks the deletion of the parent row if child references exist (Default behavior).",
+    command: "-- Create foreign key with cascade delete rule\nCREATE TABLE order_items (\n  item_id INT PRIMARY KEY,\n  order_id INT,\n  product_id INT,\n  quantity INT,\n  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE\n);"
+  },
+  {
+    id: 673,
+    title: "Using COALESCE to implement conditional queries dynamically",
+    category: "sql",
+    difficulty: "medium",
+    answer: "COALESCE is useful for writing dynamic search filters in stored procedures or APIs. By passing optional search parameters alongside column checks, you can filter records dynamically without building dynamic SQL queries.",
+    command: "-- Dynamic search where parameters can be NULL (if NULL, column matches itself)\nSELECT employee_id, first_name, job_id, department_id\nFROM employees\nWHERE department_id = COALESCE(:dept_param, department_id)\n  AND job_id = COALESCE(:job_param, job_id);"
+  },
+  {
+    id: 674,
+    title: "Difference between char, varchar, and text datatypes in databases",
+    category: "sql",
+    difficulty: "medium",
+    answer: "• CHAR(N): Fixed-length string. If you insert a string shorter than N, the database pads it with trailing spaces. Best for fixed-length codes (ISO country codes, status chars).\n• VARCHAR(N): Variable-length string up to N characters. Stores exactly the length of the string plus a 1-2 byte length prefix. Best for names, addresses, and variable strings.\n• TEXT / CLOB: Unlimited length string (or up to 2-4GB). Typically stored off-row (outside the table's main data page) with pointers, resulting in slightly slower access times but supporting massive text payloads.",
+    command: "-- Table definition using optimal character structures\nCREATE TABLE product_catalogue (\n  product_iso_code CHAR(3) PRIMARY KEY, -- e.g. 'USA', 'CAN'\n  product_name VARCHAR(100) NOT NULL,\n  product_description TEXT\n);"
+  },
+  {
+    id: 675,
+    title: "Explain Oracle ASM (Automatic Storage Management)",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "ASM provides a clustered file system and volume manager specifically designed for Oracle databases. It uses disk groups to provide mirroring and striping without needing a third-party logical volume manager.",
+    command: "SELECT name, state, type FROM v$asm_diskgroup;"
+  },
+  {
+    id: 676,
+    title: "How to check active user sessions in Oracle?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "You can query the v$session dynamic performance view filtering by type = 'USER' to see active user connections.",
+    command: "SELECT sid, serial#, username, status FROM v$session WHERE type = 'USER';"
+  },
+  {
+    id: 677,
+    title: "What is an Oracle Data Block?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "The data block is the smallest unit of I/O in an Oracle database. Multiple OS blocks make up one Oracle data block (e.g. 8KB).",
+    command: "SHOW PARAMETER db_block_size;"
+  },
+  {
+    id: 678,
+    title: "Explain the role of LGWR process",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "The Log Writer (LGWR) is a background process that writes redo entries from the redo log buffer in the SGA to the online redo log files on disk.",
+    command: "-- No direct command, it runs in the background. Check via: ps -ef | grep lgwr"
+  },
+  {
+    id: 679,
+    title: "How do you gather schema statistics?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "You use the DBMS_STATS package to gather optimizer statistics for tables, indexes, schemas, or the entire database to help the cost-based optimizer (CBO).",
+    command: "EXEC DBMS_STATS.GATHER_SCHEMA_STATS('HR');"
+  },
+  {
+    id: 680,
+    title: "What is the difference between TRUNCATE and DELETE?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "TRUNCATE is a DDL command that quickly removes all rows and resets the high water mark without generating extensive undo/redo. DELETE is a DML command that logs each row deletion.",
+    command: "TRUNCATE TABLE employees_temp;"
+  },
+  {
+    id: 681,
+    title: "How to find the size of a database table?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "Query the dba_segments or user_segments view to sum up the bytes allocated for a specific table.",
+    command: "SELECT segment_name, bytes/1024/1024 as MB FROM user_segments WHERE segment_type='TABLE' AND segment_name='EMPLOYEES';"
+  },
+  {
+    id: 682,
+    title: "Explain Oracle RAC (Real Application Clusters)",
+    category: "oracle dba",
+    difficulty: "hard",
+    answer: "Oracle RAC allows multiple instances running on different servers to access a single physical database concurrently. It provides high availability and scalability.",
+    command: "srvctl status database -d orcl"
+  },
+  {
+    id: 683,
+    title: "What is a Tablespace?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "A tablespace is a logical storage unit within an Oracle database. It groups related logical structures like tables and indexes, and physically consists of one or more data files.",
+    command: "SELECT tablespace_name, status FROM dba_tablespaces;"
+  },
+  {
+    id: 684,
+    title: "How to resize a data file?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "You can use the ALTER DATABASE DATAFILE command to resize an existing data file to increase or decrease its size.",
+    command: "ALTER DATABASE DATAFILE '/u01/app/oracle/oradata/users01.dbf' RESIZE 10G;"
+  },
+  {
+    id: 685,
+    title: "Explain the role of the DBWn process",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "The Database Writer (DBWn) process writes dirty blocks (modified data blocks) from the database buffer cache to the data files on disk.",
+    command: "ps -ef | grep dbw"
+  },
+  {
+    id: 686,
+    title: "How to check database backup status in RMAN?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "Use RMAN commands like LIST BACKUP or query the v$rman_backup_job_details view.",
+    command: "RMAN> LIST BACKUP SUMMARY;"
+  },
+  {
+    id: 687,
+    title: "What is an Oracle Sequence?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "A sequence is a database object used to generate unique integers automatically, typically for primary keys.",
+    command: "CREATE SEQUENCE emp_seq START WITH 1 INCREMENT BY 1;"
+  },
+  {
+    id: 688,
+    title: "How to unlock a locked user account?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "Use the ALTER USER command specifying ACCOUNT UNLOCK.",
+    command: "ALTER USER hr ACCOUNT UNLOCK;"
+  },
+  {
+    id: 689,
+    title: "What is the SYSAUX tablespace?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "SYSAUX is an auxiliary tablespace to the SYSTEM tablespace. It stores metadata for database components (like AWR) to reduce the load on the SYSTEM tablespace.",
+    command: "SELECT occupant_name, space_usage_kbytes FROM v$sysaux_occupants;"
+  },
+  {
+    id: 690,
+    title: "How to force a log switch?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "You can manually force a log switch using ALTER SYSTEM SWITCH LOGFILE, which causes LGWR to start writing to the next redo log group.",
+    command: "ALTER SYSTEM SWITCH LOGFILE;"
+  },
+  {
+    id: 691,
+    title: "Explain Oracle Flashback Query",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "Flashback Query allows you to view data as it existed at a past point in time, using undo data.",
+    command: "SELECT * FROM employees AS OF TIMESTAMP (SYSTIMESTAMP - INTERVAL '1' HOUR);"
+  },
+  {
+    id: 692,
+    title: "How to view the current database instance name?",
+    category: "oracle dba",
+    difficulty: "easy",
+    answer: "Query the v$instance view.",
+    command: "SELECT instance_name, host_name FROM v$instance;"
+  },
+  {
+    id: 693,
+    title: "What is an Index Organized Table (IOT)?",
+    category: "oracle dba",
+    difficulty: "hard",
+    answer: "An IOT stores table data directly within a B-tree index structure based on the primary key, providing fast access via the primary key.",
+    command: "CREATE TABLE t1 (id INT PRIMARY KEY, val VARCHAR(10)) ORGANIZATION INDEX;"
+  },
+  {
+    id: 694,
+    title: "How to drop a database user and all their objects?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "Use the DROP USER command with the CASCADE keyword.",
+    command: "DROP USER test_user CASCADE;"
+  },
+  {
+    id: 695,
+    title: "What is AWR (Automatic Workload Repository)?",
+    category: "oracle dba",
+    difficulty: "hard",
+    answer: "AWR is a built-in repository that collects, processes, and maintains performance statistics for problem detection and self-tuning.",
+    command: "SELECT * FROM dba_hist_snapshot;"
+  },
+  {
+    id: 696,
+    title: "How to check the undo retention period?",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "Check the undo_retention parameter, which specifies the minimum time (in seconds) undo data is retained.",
+    command: "SHOW PARAMETER undo_retention;"
+  },
+  {
+    id: 697,
+    title: "Explain the role of the PMON process",
+    category: "oracle dba",
+    difficulty: "medium",
+    answer: "The Process Monitor (PMON) performs process recovery when a user process fails. It cleans up the cache and frees resources that the process was using.",
+    command: "ps -ef | grep pmon"
+  },
+  {
+    id: 698,
+    title: "How to multiplex Oracle control files?",
+    category: "oracle dba",
+    difficulty: "hard",
+    answer: "Modify the control_files parameter to include multiple paths, shut down the database, copy the existing control file to the new locations, and start up.",
+    command: "ALTER SYSTEM SET control_files='/u01/c1.ctl','/u02/c2.ctl' SCOPE=SPFILE;"
+  },
+  {
+    id: 699,
+    title: "What is Oracle Data Guard?",
+    category: "oracle dba",
+    difficulty: "hard",
+    answer: "Data Guard provides disaster recovery by creating and maintaining one or more standby databases synchronized with the primary database.",
+    command: "SELECT process, status, sequence# FROM v$managed_standby;"
   }
 ];

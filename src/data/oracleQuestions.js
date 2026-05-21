@@ -36,6 +36,7 @@ export const oracleQuestions = QUESTIONS_DATA
   .filter(q => q.category === 'oracle dba')
   .map(q => ({
     id: `ora-${q.id}`,
+    rawId: q.id,
     title: q.title,
     category: q.category,
     tags: getTags(q.title),

@@ -12,6 +12,7 @@ import ShellScripting from './pages/ShellScripting';
 import DevOps from './pages/DevOps';
 import AzureCloud from './pages/AzureCloud';
 import GoogleCloud from './pages/GoogleCloud';
+import Auth from './pages/Auth';
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -90,6 +91,8 @@ function App() {
       return <Technologies />;
     case '/roadmaps':
       return <Roadmaps />;
+    case '/auth':
+      return <Auth />;
     default:
       return <Home />;
   }

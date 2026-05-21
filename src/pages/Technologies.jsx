@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
-import { FiDatabase, FiTerminal, FiGitBranch } from 'react-icons/fi';
+import { FaDatabase, FaLinux, FaAws, FaArrowRight } from 'react-icons/fa';
+import { FiDatabase, FiTerminal, FiGitBranch, FiChevronRight } from 'react-icons/fi';
 import { SiGooglecloud } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
@@ -14,7 +14,8 @@ const TECH_CARDS = [
     icon: <FaDatabase />,
     accent: '#ff5722',
     glow: 'rgba(255, 87, 34, 0.4)',
-    iconBg: 'rgba(255, 87, 34, 0.15)'
+    iconBg: 'rgba(255, 87, 34, 0.1)',
+    desc: 'Core DBA concepts, memory architectures (SGA/PGA), performance tuning, and high-availability configurations.'
   },
   {
     id: 'linux-admin',
@@ -23,7 +24,8 @@ const TECH_CARDS = [
     icon: <FaLinux />,
     accent: '#10b981',
     glow: 'rgba(16, 185, 129, 0.4)',
-    iconBg: 'rgba(16, 185, 129, 0.15)'
+    iconBg: 'rgba(16, 185, 129, 0.1)',
+    desc: 'Kernel parameters, process scheduling, file systems, LVM disk management, and shell administration.'
   },
   {
     id: 'sql',
@@ -32,7 +34,8 @@ const TECH_CARDS = [
     icon: <FiDatabase />,
     accent: '#06b6d4',
     glow: 'rgba(6, 182, 212, 0.4)',
-    iconBg: 'rgba(6, 182, 212, 0.15)'
+    iconBg: 'rgba(6, 182, 212, 0.1)',
+    desc: 'Advanced relational operations, execution plans, index optimization, normalisation, and analytic queries.'
   },
   {
     id: 'aws-cloud',
@@ -41,7 +44,8 @@ const TECH_CARDS = [
     icon: <FaAws />,
     accent: '#ff9900',
     glow: 'rgba(255, 153, 0, 0.4)',
-    iconBg: 'rgba(255, 153, 0, 0.15)'
+    iconBg: 'rgba(255, 153, 0, 0.1)',
+    desc: 'RDS architectures, EC2 scaling, VPC networking, IAM security, S3 storage solutions, and cloud migrations.'
   },
   {
     id: 'shell-scripting',
@@ -50,7 +54,8 @@ const TECH_CARDS = [
     icon: <FiTerminal />,
     accent: '#3b82f6',
     glow: 'rgba(59, 130, 246, 0.4)',
-    iconBg: 'rgba(59, 130, 246, 0.15)'
+    iconBg: 'rgba(59, 130, 246, 0.1)',
+    desc: 'Bash scripts, automation logic, backup routines, text processing (sed, awk), and log monitoring.'
   },
   {
     id: 'devops',
@@ -59,16 +64,18 @@ const TECH_CARDS = [
     icon: <FiGitBranch />,
     accent: '#a855f7',
     glow: 'rgba(168, 85, 247, 0.4)',
-    iconBg: 'rgba(168, 85, 247, 0.15)'
+    iconBg: 'rgba(168, 85, 247, 0.1)',
+    desc: 'CI/CD pipelines, Infrastructure as Code, Docker containerization, and Kubernetes orchestration.'
   },
   {
     id: 'azure',
     name: 'Azure Cloud',
     path: '/azure-cloud',
     icon: <VscAzure />,
-    accent: '#0078D4',
-    glow: 'rgba(0, 120, 212, 0.4)',
-    iconBg: 'rgba(0, 120, 212, 0.15)'
+    accent: '#10b981',
+    glow: 'rgba(16, 185, 129, 0.4)',
+    iconBg: 'rgba(16, 185, 129, 0.1)',
+    desc: 'Azure Virtual Machines, App Services, AKS, Azure SQL, and robust Entra ID security integrations.'
   },
   {
     id: 'google',
@@ -77,21 +84,23 @@ const TECH_CARDS = [
     icon: <SiGooglecloud />,
     accent: '#4285F4',
     glow: 'rgba(66, 133, 244, 0.4)',
-    iconBg: 'rgba(66, 133, 244, 0.15)'
+    iconBg: 'rgba(66, 133, 244, 0.1)',
+    desc: 'GKE orchestration, Compute Engine, Cloud Spanner, and Google Cloud Load Balancing capabilities.'
   }
 ];
 
 export default function Technologies() {
-  const [hoveredCard, setHoveredCard] = useState(null);
+  const [activeId, setActiveId] = useState(TECH_CARDS[0].id);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const handleMouseMove = (e) => {
-    const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    card.style.setProperty('--x', `${x}px`);
-    card.style.setProperty('--y', `${y}px`);
-  };
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const activeTech = TECH_CARDS.find(t => t.id === activeId) || TECH_CARDS[0];
 
   return (
     <div className="tech-page-bg">
@@ -99,144 +108,309 @@ export default function Technologies() {
 
       <style>{`
         .tech-page-bg {
-          background-color: #0f172a;
-          background-image: 
-            radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.03) 0px, transparent 50%),
-            radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.03) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.03) 0px, transparent 50%);
+          background-color: #0a0f0d;
           min-height: 100vh;
           display: flex;
           flex-direction: column;
         }
 
-        .flashy-container {
-          max-width: 1200px;
+        .split-layout-container {
+          max-width: 1300px;
           margin: 0 auto;
-          padding: 80px 24px;
+          padding: 60px 24px 100px;
           width: 100%;
           display: flex;
-          align-items: center;
-          justify-content: center;
+          gap: 60px;
           flex-grow: 1;
         }
-
-        .flashy-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 30px;
-          width: 100%;
+        
+        @media (max-width: 900px) {
+          .split-layout-container {
+            flex-direction: column;
+            gap: 40px;
+            padding: 40px 20px 80px;
+          }
         }
 
-        .flashy-card {
-          background: rgba(17, 24, 39, 0.45);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 20px;
-          padding: 40px 24px;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        /* LEFT SIDE: MASTER LIST */
+        .master-list {
+          flex: 0 0 320px;
           display: flex;
           flex-direction: column;
+          gap: 12px;
+        }
+        
+        @media (max-width: 900px) {
+          .master-list {
+            flex: 1;
+            width: 100%;
+          }
+        }
+
+        .list-item {
+          display: flex;
           align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          padding: 16px 20px;
+          border-radius: 12px;
           cursor: pointer;
-          text-align: center;
+          border: 1px solid transparent;
+          transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+          background: rgba(255, 255, 255, 0.02);
+          position: relative;
+          overflow: hidden;
         }
 
-        .flashy-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(400px circle at var(--x, 0px) var(--y, 0px), rgba(255, 255, 255, 0.05), transparent 60%);
-          z-index: 1;
-          pointer-events: none;
+        .list-item:hover {
+          background: rgba(255, 255, 255, 0.04);
         }
 
-        .flashy-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 45px -15px var(--glow-color);
-          border-color: var(--hover-border);
+        .list-item.active {
+          background: var(--active-bg);
+          border-color: var(--active-border);
+          box-shadow: 0 4px 20px var(--active-glow);
+          transform: translateX(8px);
         }
 
-        .flashy-icon-container {
-          width: 80px;
-          height: 80px;
-          border-radius: 20px;
+        @media (max-width: 900px) {
+          .list-item.active {
+            transform: translateX(0) scale(1.02);
+          }
+        }
+
+        .list-icon-wrapper {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 36px;
-          margin-bottom: 24px;
-          background: var(--icon-bg);
-          color: var(--accent-color);
-          transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
+          background: var(--item-icon-bg);
+          color: var(--item-accent);
+          font-size: 20px;
+          margin-right: 16px;
+          flex-shrink: 0;
+          transition: all 0.3s ease;
+        }
+        
+        .list-item.active .list-icon-wrapper {
+           background: var(--item-accent);
+           color: #fff;
+           box-shadow: 0 0 15px var(--active-glow);
+        }
+
+        .list-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.6);
+          margin: 0;
+          flex-grow: 1;
+          transition: all 0.3s ease;
+        }
+
+        .list-item:hover .list-title {
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        .list-item.active .list-title {
+          color: #ffffff;
+          font-weight: 700;
+        }
+        
+        .list-chevron {
+           color: rgba(255, 255, 255, 0.2);
+           transition: all 0.3s ease;
+        }
+        
+        .list-item:hover .list-chevron {
+           color: rgba(255, 255, 255, 0.6);
+           transform: translateX(4px);
+        }
+        
+        .list-item.active .list-chevron {
+           color: var(--item-accent);
+           transform: translateX(4px);
+        }
+
+        /* RIGHT SIDE: DETAIL STAGE */
+        .detail-stage {
+          flex: 1;
+          background: rgba(13, 18, 16, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 24px;
           position: relative;
-          z-index: 2;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 60px;
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+          backdrop-filter: blur(20px);
+        }
+        
+        @media (max-width: 900px) {
+          .detail-stage {
+            padding: 40px 24px;
+            min-height: 400px;
+          }
         }
 
-        .flashy-card:hover .flashy-icon-container {
-          transform: scale(1.15) rotate(5deg);
-          box-shadow: 0 0 25px var(--glow-color);
+        .detail-glow-bg {
+          position: absolute;
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, var(--stage-glow) 0%, transparent 70%);
+          opacity: 0.15;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 0;
+          pointer-events: none;
+          transition: all 0.6s ease;
         }
 
-        .flashy-card-content {
+        .detail-content {
           position: relative;
-          z-index: 2;
+          z-index: 1;
+          text-align: center;
+          max-width: 500px;
+          animation: fadeScaleIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        .flashy-card-title {
-          font-size: 24px;
+        @keyframes fadeScaleIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .stage-icon-hero {
+          font-size: 80px;
+          color: var(--stage-accent);
+          margin-bottom: 32px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 160px;
+          height: 160px;
+          background: var(--stage-icon-bg);
+          border-radius: 40px;
+          box-shadow: 0 20px 50px var(--stage-glow), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+          transition: all 0.4s ease;
+        }
+
+        .stage-title {
+          font-size: 42px;
           font-weight: 800;
           color: #ffffff;
-          letter-spacing: -0.015em;
-          margin: 0;
-          transition: color 0.3s ease;
+          margin: 0 0 16px 0;
+          letter-spacing: -0.02em;
+        }
+        
+        @media (max-width: 900px) {
+          .stage-title { font-size: 32px; }
         }
 
-        .flashy-card:hover .flashy-card-title {
-           color: var(--accent-color);
+        .stage-desc {
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.6);
+          line-height: 1.6;
+          margin: 0 0 40px 0;
+        }
+
+        .btn-enter-track {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px 32px;
+          font-size: 16px;
+          font-weight: 700;
+          color: #fff;
+          background: var(--stage-accent);
+          border-radius: 9999px;
+          text-decoration: none;
+          box-shadow: 0 8px 25px var(--stage-glow);
+          transition: all 0.3s ease;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-enter-track:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 35px var(--stage-glow);
+          filter: brightness(1.1);
+        }
+        
+        .btn-enter-track svg {
+          margin-left: 8px;
+          transition: transform 0.3s ease;
+        }
+        
+        .btn-enter-track:hover svg {
+          transform: translateX(4px);
         }
       `}</style>
 
-      <main style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-        <div className="flashy-container">
-          <div className="flashy-grid">
-            {TECH_CARDS.map((card) => {
-              const isHovered = hoveredCard === card.id;
-              const cardStyles = {
-                '--glow-color': card.glow,
-                '--accent-color': card.accent,
-                '--icon-bg': card.iconBg,
-                '--hover-border': isHovered ? card.accent : 'rgba(255, 255, 255, 0.06)'
-              };
+      <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ textAlign: 'center', paddingTop: '80px', paddingBottom: '20px' }}>
+           <h1 style={{ fontSize: '48px', fontWeight: '800', color: '#fff', marginBottom: '16px', letterSpacing: '-0.025em' }}>Explore Technologies</h1>
+           <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.6)', maxWidth: '600px', margin: '0 auto', padding: '0 20px' }}>
+              Master the infrastructure, tooling, and systems that power the modern web. Choose a learning track to begin.
+           </p>
+        </div>
 
+        <div className="split-layout-container">
+          
+          {/* Master List (Left) */}
+          <div className="master-list">
+            {TECH_CARDS.map(card => {
+              const isActive = activeId === card.id;
               return (
-                <div
+                <div 
                   key={card.id}
-                  className="flashy-card"
-                  style={cardStyles}
-                  onMouseMove={handleMouseMove}
-                  onMouseEnter={() => setHoveredCard(card.id)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => { window.location.href = card.path; }}
+                  className={`list-item ${isActive ? 'active' : ''}`}
+                  onMouseEnter={() => { if (!isMobile) setActiveId(card.id); }}
+                  onClick={() => {
+                    setActiveId(card.id);
+                    if (isMobile) {
+                      document.getElementById('detail-stage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  style={{
+                    '--item-accent': card.accent,
+                    '--item-icon-bg': card.iconBg,
+                    '--active-bg': `${card.accent}15`,
+                    '--active-border': `${card.accent}50`,
+                    '--active-glow': `${card.accent}30`
+                  }}
                 >
-                  <div className="flashy-icon-container">
+                  <div className="list-icon-wrapper">
                     {card.icon}
                   </div>
-
-                  <div className="flashy-card-content">
-                    <h2 className="flashy-card-title">{card.name}</h2>
-                  </div>
+                  <h3 className="list-title">{card.name}</h3>
+                  <FiChevronRight size={20} className="list-chevron" />
                 </div>
               );
             })}
           </div>
+
+          {/* Detail Stage (Right) */}
+          <div className="detail-stage" id="detail-stage" style={{
+             '--stage-accent': activeTech.accent,
+             '--stage-glow': activeTech.glow,
+             '--stage-icon-bg': activeTech.iconBg
+          }}>
+            <div className="detail-glow-bg"></div>
+            
+            <div className="detail-content" key={activeTech.id}>
+              <div className="stage-icon-hero">
+                {activeTech.icon}
+              </div>
+              <h2 className="stage-title">{activeTech.name}</h2>
+              <p className="stage-desc">{activeTech.desc}</p>
+              
+              <a href={activeTech.path} className="btn-enter-track">
+                Enter Track <FaArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+
         </div>
       </main>
 

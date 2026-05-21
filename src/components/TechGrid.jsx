@@ -113,7 +113,7 @@ export default function TechGrid() {
                       fontSize: '11px',
                       marginTop: '4px',
                       display: 'inline-block',
-                      backgroundColor: 'rgba(37,99,235,0.15)',
+                      backgroundColor: 'rgba(16,185,129,0.15)',
                       color: 'var(--primary-hover)',
                       padding: '2px 8px',
                       borderRadius: '100px',

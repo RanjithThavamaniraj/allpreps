@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { QUESTIONS_DATA } from '../data/questionsData';
@@ -31,6 +31,40 @@ export default function Roadmaps() {
   });
   const [expandedId, setExpandedId] = useState(null);
   const [activeTabs, setActiveTabs] = useState({}); // Stores active tab ('answer' or 'command') per question ID
+  const [user, setUser] = useState(null);
+
+  // Sync user and completed questions from localStorage reactively
+  useEffect(() => {
+    const syncData = () => {
+      try {
+        const storedUser = localStorage.getItem('allpreps_user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        } else {
+          setUser(null);
+        }
+
+        const storedCompleted = localStorage.getItem('allpreps_completed_questions');
+        if (storedCompleted) {
+          setCompletedIds(JSON.parse(storedCompleted));
+        }
+      } catch (e) {
+        console.error("Error syncing with localStorage:", e);
+      }
+    };
+
+    syncData();
+    window.addEventListener('focus', syncData);
+    window.addEventListener('storage', syncData);
+
+    const interval = setInterval(syncData, 1000);
+
+    return () => {
+      window.removeEventListener('focus', syncData);
+      window.removeEventListener('storage', syncData);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Filter questions for the selected track
   const trackQuestions = useMemo(() => {
@@ -76,6 +110,23 @@ export default function Roadmaps() {
       hardTotal
     };
   }, [trackQuestions, groupedQuestions, completedIds]);
+
+  // Compute all tracks progress summary
+  const allTracksProgress = useMemo(() => {
+    return TRACKS.map(t => {
+      const questions = QUESTIONS_DATA.filter(q => q.category === t.id);
+      const total = questions.length;
+      const questionIds = questions.map(q => q.id);
+      const completed = completedIds.filter(id => questionIds.includes(id)).length;
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return {
+        ...t,
+        completed,
+        total,
+        pct
+      };
+    });
+  }, [completedIds]);
 
   const toggleCompleted = (id, e) => {
     e.stopPropagation(); // Avoid expanding/collapsing when clicking the checkbox
@@ -249,7 +300,9 @@ export default function Roadmaps() {
               <div className="card" style={{ padding: '24px', backgroundColor: 'var(--bg-surface)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
                   <FiAward size={22} style={{ color: 'var(--primary-hover)' }} />
-                  <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Track Statistics</h3>
+                  <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                    {user ? `${user.name}'s Statistics` : 'Track Statistics'}
+                  </h3>
                 </div>
 
                 {/* Progress Bar */}
@@ -306,6 +359,53 @@ export default function Roadmaps() {
                     🎉 Track fully completed! Excellent job!
                   </div>
                 )}
+
+                {/* All Tracks Summary */}
+                <div style={{ marginTop: '24px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+                  <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    All Tracks Summary
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {allTracksProgress.map(track => {
+                      const isCurrent = track.id === selectedTrack;
+                      return (
+                        <div 
+                          key={track.id} 
+                          onClick={() => { setSelectedTrack(track.id); setExpandedId(null); }}
+                          style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '4px',
+                            cursor: 'pointer',
+                            padding: '6px',
+                            borderRadius: '6px',
+                            backgroundColor: isCurrent ? 'rgba(16, 185, 129, 0.05)' : 'transparent',
+                            transition: 'all 0.2s ease',
+                            border: isCurrent ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid transparent'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                            <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '12px', display: 'flex', alignItems: 'center', color: isCurrent ? 'var(--primary-hover)' : 'var(--text-muted)' }}>
+                                {track.icon}
+                              </span>
+                              <span style={{ fontWeight: isCurrent ? '700' : '400', color: isCurrent ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                                {track.name}
+                              </span>
+                            </span>
+                            <span style={{ fontWeight: '600', color: isCurrent ? 'var(--primary-hover)' : 'var(--text-muted)' }}>
+                              {track.pct}%
+                            </span>
+                          </div>
+                          <div style={{ height: '4px', backgroundColor: 'var(--bg-base)', borderRadius: '100px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', backgroundColor: isCurrent ? 'var(--primary-hover)' : 'var(--primary)', opacity: isCurrent ? 1 : 0.6, width: `${track.pct}%`, transition: 'width 0.4s ease' }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>

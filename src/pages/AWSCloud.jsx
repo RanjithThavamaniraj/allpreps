@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { FaAws } from 'react-icons/fa';
-import { FiArrowLeft, FiSearch, FiChevronDown, FiChevronUp, FiCpu, FiCloud, FiTrendingUp } from 'react-icons/fi';
+import { FiArrowLeft, FiSearch, FiChevronDown, FiChevronUp, FiCpu, FiCloud, FiTrendingUp, FiCheck } from 'react-icons/fi';
 import { QUESTIONS_DATA } from '../data/questionsData';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -35,6 +35,53 @@ function getTags(title) {
 
 export default function AWSCloud() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [completedIds, setCompletedIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem('allpreps_completed_questions');
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Error reading localStorage:", e);
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    const syncCompleted = () => {
+      try {
+        const stored = localStorage.getItem('allpreps_completed_questions');
+        if (stored) {
+          setCompletedIds(JSON.parse(stored));
+        }
+      } catch (e) {
+        console.error("Error syncing completed questions:", e);
+      }
+    };
+    syncCompleted();
+    window.addEventListener('focus', syncCompleted);
+    window.addEventListener('storage', syncCompleted);
+    const interval = setInterval(syncCompleted, 1000);
+    return () => {
+      window.removeEventListener('focus', syncCompleted);
+      window.removeEventListener('storage', syncCompleted);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const toggleCompleted = (rawId, e) => {
+    e.stopPropagation();
+    let updated;
+    if (completedIds.includes(rawId)) {
+      updated = completedIds.filter(x => x !== rawId);
+    } else {
+      updated = [...completedIds, rawId];
+    }
+    setCompletedIds(updated);
+    try {
+      localStorage.setItem('allpreps_completed_questions', JSON.stringify(updated));
+    } catch (err) {
+      console.error("Error saving completed questions:", err);
+    }
+  };
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [activeTab, setActiveTab] = useState({}); // Active tab ('details' vs 'solution') for each question
@@ -42,6 +89,7 @@ export default function AWSCloud() {
   const awsQuestions = useMemo(() => {
     return QUESTIONS_DATA.filter(q => q.category === 'aws').map(q => ({
       id: `aws-${q.id}`,
+      rawId: q.id,
       title: q.title,
       difficulty: q.difficulty,
       description: q.title + ' - Scenario-based question covering AWS architecture, RDS databases, IAM security, VPC networks, and S3 storage.',
@@ -169,16 +217,44 @@ export default function AWSCloud() {
                 filteredQuestions.map((q, idx) => {
                   const isExpanded = expandedId === q.id;
                   const currentTab = activeTab[q.id] || 'details';
+                  const completed = completedIds.includes(q.rawId);
 
                   return (
                     <div
                       key={q.id}
                       className={`q-card ${isExpanded ? 'tech-grid-card-active' : ''}`}
+                      style={{
+                        borderColor: completed ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                        boxShadow: completed ? '0 0 12px rgba(16, 185, 129, 0.03)' : 'none'
+                      }}
                     >
                       <div className="q-summary-row" onClick={() => toggleExpand(q.id)}>
-                        <div className="q-title-side">
-                          <span className="q-number">#{String(idx + 1).padStart(2, '0')}</span>
-                          <h3 className="q-title">{q.title}</h3>
+                        <div className="q-title-side" style={{ display: 'flex', alignItems: 'center' }}>
+                          <div
+                            onClick={(e) => toggleCompleted(q.rawId, e)}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '4px',
+                              border: completed ? '2px solid #10b981' : '2px solid var(--border)',
+                              backgroundColor: completed ? '#10b981' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              marginRight: '12px',
+                              flexShrink: 0
+                            }}
+                          >
+                            {completed && <FiCheck size={11} style={{ color: '#0f172a', fontWeight: 'bold' }} />}
+                          </div>
+                          <span className="q-number" style={{ marginRight: '8px' }}>#{String(idx + 1).padStart(2, '0')}</span>
+                          <h3 className="q-title" style={{ 
+                            textDecoration: completed ? 'line-through' : 'none', 
+                            color: completed ? 'var(--text-secondary)' : 'var(--text-primary)',
+                            margin: 0
+                          }}>{q.title}</h3>
                         </div>
 
                         <div className="q-meta-side">

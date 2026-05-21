@@ -20,7 +20,7 @@ export default function Questions({ selectedCategory, searchQuery, onSearchChang
       const matchSearch = !searchQuery || q.title.toLowerCase().includes(searchQuery.toLowerCase()) || q.category.includes(searchQuery.toLowerCase());
 
       return matchCat && matchDiff && matchSearch;
-    });
+    }).sort((a, b) => b.id - a.id); // Show newest questions first
   }, [selectedCategory, searchQuery, activeChip, difficultyFilter]);
 
   const toggleExpand = (id) => {
@@ -104,7 +104,7 @@ export default function Questions({ selectedCategory, searchQuery, onSearchChang
                   <div
                     className="q-table-row"
                     onClick={() => toggleExpand(q.id)}
-                    style={isExpanded ? { background: 'var(--primary-light)', borderColor: 'rgba(37,99,235,0.3)' } : {}}
+                    style={isExpanded ? { background: 'var(--primary-light)', borderColor: 'rgba(16,185,129,0.3)' } : {}}
                   >
                     <span className="q-row-num">{String(idx + 1).padStart(2, '0')}</span>
                     <span className="q-row-title">{q.title}</span>

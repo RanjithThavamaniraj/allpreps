@@ -1,51 +1,56 @@
-import { useState } from 'react';
 import Navbar    from '../components/Navbar';
 import Hero      from '../components/Hero';
 import Stats     from '../components/Stats';
 import Footer    from '../components/Footer';
 
-import { FiSearch, FiBookOpen, FiCheckCircle, FiMail } from 'react-icons/fi';
+import { FiSearch, FiBookOpen, FiArrowRight, FiTarget, FiTrendingUp } from 'react-icons/fi';
 
-/* ── HOW IT WORKS (inline) ── */
+/* ── HOW IT WORKS ── */
 const HIW_STEPS = [
   {
     num: '01',
-    icon: <FiSearch size={22} />,
-    title: 'Search a Topic',
-    desc:  'Find the technology or domain you are preparing for — Oracle DBA, Linux, AWS, SQL, DevOps and more.',
+    icon: <FiSearch size={24} />,
+    title: 'Choose Your Track',
+    desc:  'Pick from 8 technology tracks — Oracle DBA, Linux, AWS, Azure, GCP, SQL, Shell Scripting, and DevOps.',
   },
   {
     num: '02',
-    icon: <FiBookOpen size={22} />,
-    title: 'Study Scenarios',
-    desc:  'Read curated, real-world interview scenarios written by industry veterans and senior architects.',
+    icon: <FiBookOpen size={24} />,
+    title: 'Study Real Scenarios',
+    desc:  'Dive into curated, production-grade interview scenarios designed by senior architects and industry veterans.',
   },
   {
     num: '03',
-    icon: <FiCheckCircle size={22} />,
-    title: 'Practice Commands',
-    desc:  'Work through validated SQL scripts, shell commands, and config blueprints for every scenario.',
+    icon: <FiTarget size={24} />,
+    title: 'Mock Interview Mode',
+    desc:  'Test yourself with 100 randomized questions in our interactive simulator. New questions every session.',
+  },
+  {
+    num: '04',
+    icon: <FiTrendingUp size={24} />,
+    title: 'Track & Master',
+    desc:  'Follow structured roadmaps from Easy → Medium → Hard. Monitor your progress and level up systematically.',
   },
 ];
 
 function HowItWorks() {
   return (
-    <section className="hiw">
+    <section className="hiw-v2">
       <div className="container">
         <div className="section-header fade-up">
-          <span className="section-eyebrow">How It Works</span>
-          <h2 className="section-title">Three steps to interview-ready</h2>
-          <p className="section-sub">
+          <span className="section-eyebrow-v2">How It Works</span>
+          <h2 className="section-title-v2">Four steps to interview-ready</h2>
+          <p className="section-sub-v2">
             A structured preparation workflow that mirrors real enterprise hiring rounds.
           </p>
         </div>
-        <div className="hiw-grid">
+        <div className="hiw-v2-grid">
           {HIW_STEPS.map((s, i) => (
-            <div key={i} className={`hiw-card fade-up delay-${i + 1}`}>
-              <span className="hiw-num">{s.num}</span>
-              <div className="hiw-icon-box">{s.icon}</div>
-              <h3 className="hiw-title">{s.title}</h3>
-              <p className="hiw-desc">{s.desc}</p>
+            <div key={i} className={`hiw-v2-card fade-up delay-${i + 1}`}>
+              <div className="hiw-v2-num">{s.num}</div>
+              <div className="hiw-v2-icon">{s.icon}</div>
+              <h3 className="hiw-v2-title">{s.title}</h3>
+              <p className="hiw-v2-desc">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -54,55 +59,39 @@ function HowItWorks() {
   );
 }
 
-/* ── CTA BANNER (inline) ── */
-function CTABanner() {
-  const [email, setEmail]       = useState('');
-  const [success, setSuccess]   = useState(false);
-  const [loading, setLoading]   = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!email) return;
-    setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1000);
-  };
+/* ── FEATURE HIGHLIGHTS ── */
+function FeatureHighlights() {
+  const features = [
+    {
+      icon: <FiTrendingUp size={28} />,
+      title: 'Track your progress',
+      desc: 'Structured paths from Easy → Medium → Hard for every technology. Track your progress and build mastery systematically.',
+      link: '/roadmaps',
+      accent: '#34d399',
+    },
+  ];
 
   return (
-    <section className="cta-banner">
+    <section className="features-v2">
       <div className="container">
-        <div className="cta-inner fade-up">
-          <span className="section-eyebrow">Stay Sharp</span>
-          <h2 className="cta-title">
-            Ready to crack your next DBA interview?
-          </h2>
-          <p className="cta-sub">
-            Get a curated weekly digest of scenario-based questions, system design cards, and
-            expert tips — delivered straight to your inbox.
+        <div className="section-header fade-up">
+          <span className="section-eyebrow-v2">Platform Features</span>
+          <h2 className="section-title-v2">Everything you need to prepare</h2>
+          <p className="section-sub-v2">
+            A comprehensive toolkit designed for senior engineers and architects.
           </p>
-
-          {success ? (
-            <div className="cta-success">
-              <FiCheckCircle /> You're subscribed! Check your inbox soon.
-            </div>
-          ) : (
-            <form className="cta-form" onSubmit={handleSubmit}>
-              <input
-                type="email"
-                className="input-field"
-                placeholder="your@email.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-              <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-                {loading ? 'Subscribing…' : <><FiMail size={15} /> Subscribe</>}
-              </button>
-            </form>
-          )}
-
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            No spam, unsubscribe anytime.
-          </p>
+        </div>
+        <div className="features-v2-grid">
+          {features.map((f, i) => (
+            <a key={i} href={f.link} className={`features-v2-card fade-up delay-${i + 1}`} style={{ '--card-accent': f.accent }}>
+              <div className="features-v2-icon">{f.icon}</div>
+              <h3 className="features-v2-title">{f.title}</h3>
+              <p className="features-v2-desc">{f.desc}</p>
+              <span className="features-v2-link">
+                Explore <FiArrowRight size={14} />
+              </span>
+            </a>
+          ))}
         </div>
       </div>
     </section>
@@ -111,39 +100,18 @@ function CTABanner() {
 
 /* ── HOME ── */
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleChipClick = (id) => {
-    const routeMap = {
-      'oracle rac': '/oracle-dba',
-      'rman': '/oracle-dba',
-      'linux': '/linux-admin',
-      'aws': '/aws-cloud',
-      'sql': '/sql-admin',
-      'kubernetes': '/devops',
-    };
-    const route = routeMap[id.toLowerCase()] || '/mock-interviews';
-    window.history.pushState({}, '', route);
-    window.dispatchEvent(new Event('popstate'));
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
       <main style={{ flexGrow: 1 }}>
-        <Hero
-          searchVal={searchQuery}
-          onSearchChange={setSearchQuery}
-          activeChip=""
-          onChipClick={handleChipClick}
-        />
+        <Hero />
 
         <Stats />
 
-        <HowItWorks />
+        <FeatureHighlights />
 
-        <CTABanner />
+        <HowItWorks />
       </main>
 
       <Footer />
