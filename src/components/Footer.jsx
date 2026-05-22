@@ -1,4 +1,5 @@
-import { FiTerminal, FiGithub, FiTwitter } from 'react-icons/fi';
+import { FiTerminal, FiGithub } from 'react-icons/fi';
+
 
 export default function Footer() {
   return (
@@ -10,24 +11,38 @@ export default function Footer() {
             AllPreps
           </a>
           <p className="footer-desc">
-            The leading interview preparation platform for database administrators,
-            systems engineers, and cloud architects.
+            Industry Standard Preparation for your Interviews.
           </p>
-          <div className="footer-socials">
-            <a href="https://github.com"   target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="GitHub"><FiGithub /></a>
-            <a href="https://twitter.com"  target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="Twitter"><FiTwitter /></a>
+          <span className="footer-tagline">Oracle DBA • Linux • SQL • AWS • DevOps</span>
+          <span className="footer-built">Built by Ranjith T</span>
+        </div>
+
+        <div className="footer-col">
+          <h4 className="footer-heading">Platform</h4>
+          <div className="footer-links">
+            <a href="/technologies">Technologies</a>
+            <a href="/mock-interviews">Mock Interviews</a>
+            <a href="/interview-questions">Interview Guides</a>
           </div>
         </div>
 
+        <div className="footer-col">
+          <h4 className="footer-heading">Connect</h4>
+          <div className="footer-links">
+            <a href="https://github.com/RanjithThavamaniraj" target="_blank" rel="noopener noreferrer">
+              <FiGithub /> GitHub
+            </a>
+
+          </div>
+        </div>
       </div>
 
       <div className="footer-bar">
         <div className="container footer-bar-inner">
-          <p>© {new Date().getFullYear()} AllPreps Inc. All rights reserved.</p>
+          <p>© 2026 AllPreps. Built for builders and learners.</p>
           <div className="footer-bar-links">
             <a href="#">Privacy</a>
             <a href="#">Terms</a>
-            <a href="#">Compliance</a>
           </div>
         </div>
       </div>

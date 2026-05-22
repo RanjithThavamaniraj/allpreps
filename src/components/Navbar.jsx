@@ -31,7 +31,7 @@ export default function Navbar() {
       }
     };
     checkUser();
-    
+
     // Listen for changes across tabs or windows
     const handleStorageChange = () => checkUser();
     const handleMessage = (e) => {
@@ -70,18 +70,20 @@ export default function Navbar() {
 
         <div className="nav-links">
           <a href="/technologies"        className="nav-link">Technologies</a>
-          <a href="/interview-questions" className="nav-link">Interview Questions</a>
+          <a href="/interview-questions" className="nav-link">Interview Guides</a>
           <a href="/mock-interviews"     className="nav-link">Mock Interviews</a>
-          <a href="/roadmaps"            className="nav-link">Track your progress</a>
+          <a href="/roadmaps"            className="nav-link">Resources</a>
+
         </div>
 
         <div className="nav-ctas">
+          <a href="/technologies" className="btn btn-primary btn-sm">Start Learning</a>
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '600' }}>
+            <div className="nav-user">
+              <span className="nav-user-name">
                 Hi, {user.name || 'User'}
               </span>
-              <button onClick={handleSignOut} className="btn btn-ghost btn-sm" style={{ padding: '6px 12px', fontSize: '13px' }}>
+              <button onClick={handleSignOut} className="btn btn-ghost btn-sm">
                 Sign Out
               </button>
             </div>
@@ -102,13 +104,15 @@ export default function Navbar() {
       {open && (
         <div className="mobile-menu">
           <a href="/technologies"        className="mobile-link" onClick={() => setOpen(false)}>Technologies</a>
-          <a href="/interview-questions" className="mobile-link" onClick={() => setOpen(false)}>Interview Questions</a>
+          <a href="/interview-questions" className="mobile-link" onClick={() => setOpen(false)}>Interview Guides</a>
           <a href="/mock-interviews"     className="mobile-link" onClick={() => setOpen(false)}>Mock Interviews</a>
-          <a href="/roadmaps"            className="mobile-link" onClick={() => setOpen(false)}>Track your progress</a>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+          <a href="/roadmaps"            className="mobile-link" onClick={() => setOpen(false)}>Resources</a>
+
+          <div className="mobile-menu-footer">
+            <a href="/technologies" className="btn btn-primary btn-sm w-full" onClick={() => setOpen(false)}>Start Learning</a>
             {user ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '600', paddingLeft: '8px' }}>
+              <div className="mobile-user">
+                <span className="nav-user-name">
                   Hi, {user.name || 'User'}
                 </span>
                 <button onClick={() => { handleSignOut(); setOpen(false); }} className="btn btn-secondary btn-sm w-full">
