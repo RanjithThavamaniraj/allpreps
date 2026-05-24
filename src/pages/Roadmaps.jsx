@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { QUESTIONS_DATA } from '../data/questionsData';
+import { ALL_QUESTIONS } from '../data/questionLoader';
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
-import { FiDatabase, FiTerminal, FiGitBranch, FiChevronDown, FiChevronUp, FiCheck, FiAward } from 'react-icons/fi';
+import { FiDatabase, FiTerminal, FiGitBranch, FiAward, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { SiGooglecloud } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
@@ -29,8 +29,7 @@ export default function Roadmaps() {
       return [];
     }
   });
-  const [expandedId, setExpandedId] = useState(null);
-  const [activeTabs, setActiveTabs] = useState({}); // Stores active tab ('answer' or 'command') per question ID
+    const [activeTabs, setActiveTabs] = useState({}); // Stores active tab ('answer' or 'command') per question ID
   const [user, setUser] = useState(null);
 
   // Sync user and completed questions from localStorage reactively
@@ -68,7 +67,7 @@ export default function Roadmaps() {
 
   // Filter questions for the selected track
   const trackQuestions = useMemo(() => {
-    return QUESTIONS_DATA.filter(q => q.category === selectedTrack);
+    return ALL_QUESTIONS.filter(q => q.category === selectedTrack);
   }, [selectedTrack]);
 
   // Group questions by difficulty
@@ -114,7 +113,7 @@ export default function Roadmaps() {
   // Compute all tracks progress summary
   const allTracksProgress = useMemo(() => {
     return TRACKS.map(t => {
-      const questions = QUESTIONS_DATA.filter(q => q.category === t.id);
+      const questions = ALL_QUESTIONS.filter(q => q.category === t.id);
       const total = questions.length;
       const questionIds = questions.map(q => q.id);
       const completed = completedIds.filter(id => questionIds.includes(id)).length;
@@ -145,7 +144,7 @@ export default function Roadmaps() {
   };
 
   const toggleQuestionExpanded = (id) => {
-    setExpandedId(expandedId === id ? null : id);
+    null;
     if (!activeTabs[id]) {
       setActiveTabs(prev => ({ ...prev, [id]: 'answer' }));
     }
@@ -182,7 +181,7 @@ export default function Roadmaps() {
               return (
                 <button
                   key={t.id}
-                  onClick={() => { setSelectedTrack(t.id); setExpandedId(null); }}
+                  onClick={() => { setSelectedTrack(t.id); null; }}
                   className={`btn ${isActive ? 'btn-primary' : 'btn-secondary'}`}
                   style={{
                     display: 'flex',
@@ -226,7 +225,7 @@ export default function Roadmaps() {
                       q={q}
                       idx={idx}
                       completed={completedIds.includes(q.id)}
-                      isExpanded={expandedId === q.id}
+                      isExpanded={false}
                       activeTab={activeTabs[q.id] || 'answer'}
                       onToggleExpand={() => toggleQuestionExpanded(q.id)}
                       onToggleComplete={(e) => toggleCompleted(q.id, e)}
@@ -255,7 +254,7 @@ export default function Roadmaps() {
                       q={q}
                       idx={idx}
                       completed={completedIds.includes(q.id)}
-                      isExpanded={expandedId === q.id}
+                      isExpanded={false}
                       activeTab={activeTabs[q.id] || 'answer'}
                       onToggleExpand={() => toggleQuestionExpanded(q.id)}
                       onToggleComplete={(e) => toggleCompleted(q.id, e)}
@@ -284,7 +283,7 @@ export default function Roadmaps() {
                       q={q}
                       idx={idx}
                       completed={completedIds.includes(q.id)}
-                      isExpanded={expandedId === q.id}
+                      isExpanded={false}
                       activeTab={activeTabs[q.id] || 'answer'}
                       onToggleExpand={() => toggleQuestionExpanded(q.id)}
                       onToggleComplete={(e) => toggleCompleted(q.id, e)}
@@ -371,7 +370,7 @@ export default function Roadmaps() {
                       return (
                         <div 
                           key={track.id} 
-                          onClick={() => { setSelectedTrack(track.id); setExpandedId(null); }}
+                          onClick={() => { setSelectedTrack(track.id); null; }}
                           style={{ 
                             display: 'flex', 
                             flexDirection: 'column', 
@@ -450,7 +449,7 @@ function RoadmapItem({ q, idx, completed, isExpanded, activeTab, onToggleExpand,
             flexShrink: 0
           }}
         >
-          {completed && <FiCheck size={12} style={{ color: '#0F172A', fontWeight: 'bold' }} />}
+          {completed && <span/>}
         </div>
 
         {/* Index & Title */}
@@ -466,7 +465,7 @@ function RoadmapItem({ q, idx, completed, isExpanded, activeTab, onToggleExpand,
             flexGrow: 1
           }}
         >
-          {q.title}
+          {q.question}
         </span>
 
         {/* Action Toggle */}

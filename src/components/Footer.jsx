@@ -1,4 +1,5 @@
-import { FiTerminal, FiGithub } from 'react-icons/fi';
+import { FiGithub } from 'react-icons/fi';
+import { LogoIcon } from './Logo';
 
 
 export default function Footer() {
@@ -7,7 +8,7 @@ export default function Footer() {
       <div className="container footer-grid">
         <div className="footer-brand">
           <a href="/" className="footer-logo">
-            <FiTerminal className="footer-logo-icon" />
+            <LogoIcon size={24} />
             AllPreps
           </a>
           <p className="footer-desc">

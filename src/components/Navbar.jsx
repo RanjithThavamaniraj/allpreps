@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FiMenu, FiX, FiTerminal } from 'react-icons/fi';
+import { FiMenu, FiX } from 'react-icons/fi';
+import { LogoIcon } from './Logo';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -62,9 +63,7 @@ export default function Navbar() {
     <nav className={`navbar-v2 ${scrolled ? 'navbar-v2-scrolled' : ''}`}>
       <div className="container navbar-inner">
         <a href="/" className="brand-v2">
-          <div className="brand-v2-icon-wrap">
-            <FiTerminal size={16} />
-          </div>
+          <LogoIcon size={28} />
           AllPreps
         </a>
 

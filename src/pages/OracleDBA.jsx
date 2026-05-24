@@ -1,15 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
-import { FiArrowLeft, FiDatabase, FiSearch, FiChevronDown, FiChevronUp, FiCpu, FiTrendingUp, FiCheck } from 'react-icons/fi';
-import { oracleQuestions } from '../data/oracleQuestions';
+import { FiArrowLeft, FiDatabase, FiSearch, FiCpu, FiTrendingUp } from 'react-icons/fi';
+import { getQuestionsByTech } from '../data/questionLoader';
 import Navbar from '../components/Navbar';
+import QuestionCard from '../components/QuestionCard';
 import Footer from '../components/Footer';
 
 export default function OracleDBA() {
   const [searchQuery, setSearchQuery] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
-  const [expandedId, setExpandedId] = useState(null);
-  const [activeTab, setActiveTab] = useState({}); // Active tab ('details' vs 'solution') for each question
-  const [completedIds, setCompletedIds] = useState(() => {
+      const [completedIds, setCompletedIds] = useState(() => {
     try {
       const stored = localStorage.getItem('allpreps_completed_questions');
       return stored ? JSON.parse(stored) : [];
@@ -57,6 +56,19 @@ export default function OracleDBA() {
     }
   };
 
+  const oracleQuestions = useMemo(() => {
+    return getQuestionsByTech('oracle dba').map(q => ({
+      id: `ora-${q.id}`,
+      rawId: q.id,
+      title: q.question,
+      difficulty: q.difficulty,
+      description: q.question + ' - Scenario questions covering key DBA concepts, memory architectures, performance tuning, and high-availability.',
+      details: q.answer,
+      solution: q.command || '',
+      tags: q.tags || []
+    }));
+  }, []);
+
   const filteredQuestions = useMemo(() => {
     return oracleQuestions.filter((q) => {
       const matchesDifficulty = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
@@ -68,19 +80,10 @@ export default function OracleDBA() {
 
       return matchesDifficulty && matchesSearch;
     });
-  }, [searchQuery, difficultyFilter]);
+  }, [oracleQuestions, searchQuery, difficultyFilter]);
 
-  const toggleExpand = (id) => {
-    setExpandedId(expandedId === id ? null : id);
-    if (!activeTab[id]) {
-      setActiveTab((prev) => ({ ...prev, [id]: 'details' }));
-    }
-  };
-
-  const setTab = (qId, tabName) => {
-    setActiveTab((prev) => ({ ...prev, [qId]: tabName }));
-  };
-
+  
+  
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
@@ -172,107 +175,15 @@ export default function OracleDBA() {
                   <p>Try resetting the search bar or changing the difficulty filter.</p>
                 </div>
               ) : (
-                filteredQuestions.map((q, idx) => {
-                  const isExpanded = expandedId === q.id;
-                  const currentTab = activeTab[q.id] || 'details';
-                  const completed = completedIds.includes(q.rawId);
-
-                  return (
-                    <div
-                      key={q.id}
-                      className={`q-card ${isExpanded ? 'tech-grid-card-active' : ''}`}
-                      style={{
-                        borderColor: completed ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.06)',
-                        boxShadow: completed ? '0 0 12px rgba(16, 185, 129, 0.03)' : 'none'
-                      }}
-                    >
-                      <div className="q-summary-row" onClick={() => toggleExpand(q.id)}>
-                        <div className="q-title-side" style={{ display: 'flex', alignItems: 'center' }}>
-                          <div
-                            onClick={(e) => toggleCompleted(q.rawId, e)}
-                            style={{
-                              width: '18px',
-                              height: '18px',
-                              borderRadius: '4px',
-                              border: completed ? '2px solid #10b981' : '2px solid var(--border)',
-                              backgroundColor: completed ? '#10b981' : 'transparent',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              marginRight: '12px',
-                              flexShrink: 0
-                            }}
-                          >
-                            {completed && <FiCheck size={11} style={{ color: '#0f172a', fontWeight: 'bold' }} />}
-                          </div>
-                          <span className="q-number" style={{ marginRight: '8px' }}>#{String(idx + 1).padStart(2, '0')}</span>
-                          <h3 className="q-title" style={{ 
-                            textDecoration: completed ? 'line-through' : 'none', 
-                            color: completed ? 'var(--text-secondary)' : 'var(--text-primary)',
-                            margin: 0
-                          }}>{q.title}</h3>
-                        </div>
-
-                        <div className="q-meta-side">
-                          <span className={`badge badge-${q.difficulty}`}>{q.difficulty}</span>
-                          {isExpanded ? <FiChevronUp className="chevron" /> : <FiChevronDown className="chevron" />}
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div className="q-expanded-body">
-                          <p className="q-desc-text">{q.description}</p>
-
-                          <div className="q-details-tabs">
-                            <button
-                              onClick={() => setTab(q.id, 'details')}
-                              className={`q-details-tab-btn ${
-                                currentTab === 'details' ? 'q-details-tab-active' : ''
-                              }`}
-                            >
-                              Scenario Details
-                            </button>
-                            <button
-                              onClick={() => setTab(q.id, 'solution')}
-                              className={`q-details-tab-btn ${
-                                currentTab === 'solution' ? 'q-details-tab-active' : ''
-                              }`}
-                            >
-                              Reference Command / Plan
-                            </button>
-                          </div>
-
-                          {currentTab === 'details' && (
-                            <div className="q-tab-panel">
-                              <p className="q-desc-text" style={{ whiteSpace: 'pre-wrap' }}>
-                                {q.details}
-                              </p>
-                            </div>
-                          )}
-
-                          {currentTab === 'solution' && (
-                            <div className="q-tab-panel">
-                              <pre className="code-pre-box">
-                                <code>{q.solution}</code>
-                              </pre>
-                            </div>
-                          )}
-
-                          {/* Tags */}
-                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-                            {q.tags.map(tag => (
-                              <span key={tag} className="q-tech-tag" style={{ color: 'var(--text-secondary)', backgroundColor: 'rgba(255,255,255,0.05)' }}>
-                                #{tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
+                filteredQuestions.map((q, idx) => (
+                  <QuestionCard 
+                    key={q.id} 
+                    q={q} 
+                    idx={idx} 
+                    completed={completedIds.includes(q.rawId)} 
+                    onToggleCompleted={toggleCompleted} 
+                  />
+                ))
               )}
             </div>
           </div>
