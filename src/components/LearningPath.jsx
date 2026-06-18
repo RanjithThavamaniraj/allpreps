@@ -29,7 +29,7 @@ const tiers = [
 
 export default function LearningPath() {
   return (
-    <section className="lp-section">
+    <section className="lp-section" id="learning-path">
       <div className="container">
         <p className="lp-eyebrow">LEARNING PATH</p>
         <h2 className="lp-title">Structured Preparation Roadmap</h2>

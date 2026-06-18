@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import Navbar    from '../components/Navbar';
-import InterviewSimulator from '../components/InterviewSimulator';
+import MockInterview from '../components/MockInterview';
 import Footer    from '../components/Footer';
 
 export default function MockInterviews() {
@@ -36,12 +36,12 @@ export default function MockInterviews() {
               Mock Interviews
             </h1>
             <p className="page-sub" style={{ maxWidth: '600px', margin: '0 auto', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6' }}>
-              Simulate a real technical interview. Answer 100 random multiple-choice questions in 1 hour and 15 minutes. Note: You can pause the timer only twice.
+              AI-powered mock interviews with real-time evaluation, follow-up questions, and a detailed performance report.
             </p>
           </div>
         </header>
 
-        <InterviewSimulator />
+        <MockInterview />
       </main>
 
       <Footer />

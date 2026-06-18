@@ -4,6 +4,11 @@ import { getQuestionsByTech } from '../data/questionLoader';
 import Navbar from '../components/Navbar';
 import QuestionCard from '../components/QuestionCard';
 import Footer from '../components/Footer';
+import ProductionScenariosCallout from '../components/ProductionScenariosCallout';
+import ReadinessTechStrip from '../components/ReadinessScore/ReadinessTechStrip';
+import { getGlobalCompletedIds, subscribeToProgress, toggleTrackQuestion } from '../lib/trackProgress';
+
+const TRACK_ID = 'sql';
 
 // Helper to generate context-relevant tags based on the question title
 function getTags(title) {
@@ -35,52 +40,23 @@ function getTags(title) {
 
 export default function SQLAdmin() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [completedIds, setCompletedIds] = useState(() => {
-    try {
-      const stored = localStorage.getItem('allpreps_completed_questions');
-      return stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      console.error("Error reading localStorage:", e);
-      return [];
-    }
-  });
+  const [completedIds, setCompletedIds] = useState(() => getGlobalCompletedIds());
 
   useEffect(() => {
-    const syncCompleted = () => {
-      try {
-        const stored = localStorage.getItem('allpreps_completed_questions');
-        if (stored) {
-          setCompletedIds(JSON.parse(stored));
-        }
-      } catch (e) {
-        console.error("Error syncing completed questions:", e);
-      }
-    };
+    const syncCompleted = () => setCompletedIds(getGlobalCompletedIds());
     syncCompleted();
     window.addEventListener('focus', syncCompleted);
-    window.addEventListener('storage', syncCompleted);
-    const interval = setInterval(syncCompleted, 1000);
+    const unsub = subscribeToProgress(syncCompleted);
     return () => {
       window.removeEventListener('focus', syncCompleted);
-      window.removeEventListener('storage', syncCompleted);
-      clearInterval(interval);
+      unsub();
     };
   }, []);
 
   const toggleCompleted = (rawId, e) => {
     e.stopPropagation();
-    let updated;
-    if (completedIds.includes(rawId)) {
-      updated = completedIds.filter(x => x !== rawId);
-    } else {
-      updated = [...completedIds, rawId];
-    }
-    setCompletedIds(updated);
-    try {
-      localStorage.setItem('allpreps_completed_questions', JSON.stringify(updated));
-    } catch (err) {
-      console.error("Error saving completed questions:", err);
-    }
+    toggleTrackQuestion(TRACK_ID, rawId);
+    setCompletedIds(getGlobalCompletedIds());
   };
   const [difficultyFilter, setDifficultyFilter] = useState('all');
     
@@ -164,6 +140,8 @@ export default function SQLAdmin() {
           </div>
         </section>
 
+        <ReadinessTechStrip trackId={TRACK_ID} />
+
         {/* Filter Controls */}
         <section style={{ padding: '40px 0 20px' }}>
           <div className="container">
@@ -216,6 +194,8 @@ export default function SQLAdmin() {
             </div>
           </div>
         </section>
+
+        <ProductionScenariosCallout trackId="sql" />
       </main>
 
       <Footer />

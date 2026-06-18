@@ -4,6 +4,7 @@ import TechGrid         from '../components/TechGrid';
 import LearningPath     from '../components/LearningPath';
 import QuestionsPreview from '../components/QuestionsPreview';
 import WhyAllPreps      from '../components/WhyAllPreps';
+import ReadinessWidget  from '../components/ReadinessScore/ReadinessWidget';
 import Footer           from '../components/Footer';
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
 
       <main>
         <Hero />
+        <ReadinessWidget />
         <TechGrid />
         <LearningPath />
         <QuestionsPreview />

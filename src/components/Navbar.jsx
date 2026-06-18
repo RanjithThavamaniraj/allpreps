@@ -71,12 +71,13 @@ export default function Navbar() {
           <a href="/technologies"        className="nav-link">Technologies</a>
           <a href="/interview-questions" className="nav-link">Interview Guides</a>
           <a href="/mock-interviews"     className="nav-link">Mock Interviews</a>
+          <a href="/readiness"           className="nav-link">Readiness</a>
+          <a href="/interview-questions#practice" className="nav-link">Production Scenarios</a>
           <a href="/roadmaps"            className="nav-link">Resources</a>
 
         </div>
 
         <div className="nav-ctas">
-          <a href="/technologies" className="btn btn-primary btn-sm">Start Learning</a>
           {user ? (
             <div className="nav-user">
               <span className="nav-user-name">
@@ -105,10 +106,11 @@ export default function Navbar() {
           <a href="/technologies"        className="mobile-link" onClick={() => setOpen(false)}>Technologies</a>
           <a href="/interview-questions" className="mobile-link" onClick={() => setOpen(false)}>Interview Guides</a>
           <a href="/mock-interviews"     className="mobile-link" onClick={() => setOpen(false)}>Mock Interviews</a>
+          <a href="/readiness"           className="mobile-link" onClick={() => setOpen(false)}>Readiness</a>
+          <a href="/interview-questions#practice" className="mobile-link" onClick={() => setOpen(false)}>Production Scenarios</a>
           <a href="/roadmaps"            className="mobile-link" onClick={() => setOpen(false)}>Resources</a>
 
           <div className="mobile-menu-footer">
-            <a href="/technologies" className="btn btn-primary btn-sm w-full" onClick={() => setOpen(false)}>Start Learning</a>
             {user ? (
               <div className="mobile-user">
                 <span className="nav-user-name">

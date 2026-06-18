@@ -12,6 +12,7 @@ import ShellScripting from './pages/ShellScripting';
 import DevOps from './pages/DevOps';
 import AzureCloud from './pages/AzureCloud';
 import GoogleCloud from './pages/GoogleCloud';
+import Readiness from './pages/Readiness';
 import Auth from './pages/Auth';
 
 function App() {
@@ -91,6 +92,8 @@ function App() {
       return <Technologies />;
     case '/roadmaps':
       return <Roadmaps />;
+    case '/readiness':
+      return <Readiness />;
     case '/auth':
       return <Auth />;
     default:

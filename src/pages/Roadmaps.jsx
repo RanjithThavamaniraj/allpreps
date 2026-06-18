@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { ALL_QUESTIONS } from '../data/questionLoader';
+import { saveRoadmapProgress } from '../lib/readinessStorage';
+import { getGlobalCompletedIds, subscribeToProgress } from '../lib/trackProgress';
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
 import { FiDatabase, FiTerminal, FiGitBranch, FiAward, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { SiGooglecloud } from 'react-icons/si';
@@ -20,15 +22,7 @@ const TRACKS = [
 
 export default function Roadmaps() {
   const [selectedTrack, setSelectedTrack] = useState('oracle dba');
-  const [completedIds, setCompletedIds] = useState(() => {
-    try {
-      const stored = localStorage.getItem('allpreps_completed_questions');
-      return stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      console.error("Error reading localStorage:", e);
-      return [];
-    }
-  });
+  const [completedIds, setCompletedIds] = useState(() => getGlobalCompletedIds());
     const [activeTabs, setActiveTabs] = useState({}); // Stores active tab ('answer' or 'command') per question ID
   const [user, setUser] = useState(null);
 
@@ -42,11 +36,7 @@ export default function Roadmaps() {
         } else {
           setUser(null);
         }
-
-        const storedCompleted = localStorage.getItem('allpreps_completed_questions');
-        if (storedCompleted) {
-          setCompletedIds(JSON.parse(storedCompleted));
-        }
+        setCompletedIds(getGlobalCompletedIds());
       } catch (e) {
         console.error("Error syncing with localStorage:", e);
       }
@@ -54,13 +44,13 @@ export default function Roadmaps() {
 
     syncData();
     window.addEventListener('focus', syncData);
-    window.addEventListener('storage', syncData);
+    const unsub = subscribeToProgress(syncData);
 
-    const interval = setInterval(syncData, 1000);
+    const interval = setInterval(syncData, 2000);
 
     return () => {
       window.removeEventListener('focus', syncData);
-      window.removeEventListener('storage', syncData);
+      unsub();
       clearInterval(interval);
     };
   }, []);
@@ -128,7 +118,8 @@ export default function Roadmaps() {
   }, [completedIds]);
 
   const toggleCompleted = (id, e) => {
-    e.stopPropagation(); // Avoid expanding/collapsing when clicking the checkbox
+    e.stopPropagation();
+    const trackQuestionIds = trackQuestions.map(q => q.id);
     let updated;
     if (completedIds.includes(id)) {
       updated = completedIds.filter(x => x !== id);
@@ -136,11 +127,8 @@ export default function Roadmaps() {
       updated = [...completedIds, id];
     }
     setCompletedIds(updated);
-    try {
-      localStorage.setItem('allpreps_completed_questions', JSON.stringify(updated));
-    } catch (err) {
-      console.error("Error updating localStorage:", err);
-    }
+    const checkedInTrack = updated.filter(cid => trackQuestionIds.includes(cid));
+    saveRoadmapProgress(selectedTrack, checkedInTrack, trackQuestions.length);
   };
 
   const toggleQuestionExpanded = (id) => {

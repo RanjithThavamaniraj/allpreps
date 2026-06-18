@@ -37,6 +37,25 @@ export default function Hero() {
             <span className="hero-metric-label">Technologies</span>
           </div>
         </div>
+
+        <div className="hero-feature-pills">
+          <a href="/mock-interviews" className="hero-feature-pill">
+            <span className="hero-feature-pill-icon">🎯</span>
+            <span>Mock Interview Mode</span>
+          </a>
+          <a href="/interview-questions#practice" className="hero-feature-pill">
+            <span className="hero-feature-pill-icon">⚡</span>
+            <span>Production Scenarios</span>
+          </a>
+          <a href="/roadmaps" className="hero-feature-pill">
+            <span className="hero-feature-pill-icon">📚</span>
+            <span>Interactive Roadmaps</span>
+          </a>
+          <a href="/#learning-path" className="hero-feature-pill">
+            <span className="hero-feature-pill-icon">🗺</span>
+            <span>Learning Pathways</span>
+          </a>
+        </div>
       </div>
     </section>
   );
