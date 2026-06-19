@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { LogoIcon } from './Logo';
+import { isProUser } from '../lib/subscriptionStorage';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState(null);
+  const [pro, setPro] = useState(isProUser());
 
   useEffect(() => {
     const close = () => { if (window.innerWidth > 860) setOpen(false); };
@@ -30,10 +32,10 @@ export default function Navbar() {
       } catch (e) {
         console.error("Error reading user state:", e);
       }
+      setPro(isProUser());
     };
     checkUser();
 
-    // Listen for changes across tabs or windows
     const handleStorageChange = () => checkUser();
     const handleMessage = (e) => {
       if (e.data && e.data.type === 'ALLPREPS_AUTH_SUCCESS') {
@@ -42,13 +44,14 @@ export default function Navbar() {
     };
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('message', handleMessage);
+    window.addEventListener('allpreps-subscription-updated', checkUser);
 
-    // Polling backup to catch fast changes in the same frame/window
     const interval = setInterval(checkUser, 1000);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('message', handleMessage);
+      window.removeEventListener('allpreps-subscription-updated', checkUser);
       clearInterval(interval);
     };
   }, []);
@@ -73,13 +76,14 @@ export default function Navbar() {
           <a href="/mock-interviews"     className="nav-link">Mock Interviews</a>
           <a href="/readiness"           className="nav-link">Readiness</a>
           <a href="/interview-questions#practice" className="nav-link">Production Scenarios</a>
+          <a href="/pricing"             className="nav-link">Pricing</a>
           <a href="/roadmaps"            className="nav-link">Resources</a>
-
         </div>
 
         <div className="nav-ctas">
           {user ? (
             <div className="nav-user">
+              {pro && <span className="nav-pro-badge">PRO</span>}
               <span className="nav-user-name">
                 Hi, {user.name || 'User'}
               </span>
@@ -88,7 +92,10 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <a href="/auth" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">Sign In</a>
+            <>
+              {pro && <span className="nav-pro-badge">PRO</span>}
+              <a href="/auth" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">Sign In</a>
+            </>
           )}
         </div>
 
@@ -108,9 +115,11 @@ export default function Navbar() {
           <a href="/mock-interviews"     className="mobile-link" onClick={() => setOpen(false)}>Mock Interviews</a>
           <a href="/readiness"           className="mobile-link" onClick={() => setOpen(false)}>Readiness</a>
           <a href="/interview-questions#practice" className="mobile-link" onClick={() => setOpen(false)}>Production Scenarios</a>
+          <a href="/pricing"             className="mobile-link" onClick={() => setOpen(false)}>Pricing</a>
           <a href="/roadmaps"            className="mobile-link" onClick={() => setOpen(false)}>Resources</a>
 
           <div className="mobile-menu-footer">
+            {pro && <span className="nav-pro-badge mobile-pro-badge">PRO</span>}
             {user ? (
               <div className="mobile-user">
                 <span className="nav-user-name">

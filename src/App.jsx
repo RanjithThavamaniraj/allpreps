@@ -12,7 +12,14 @@ import ShellScripting from './pages/ShellScripting';
 import DevOps from './pages/DevOps';
 import AzureCloud from './pages/AzureCloud';
 import GoogleCloud from './pages/GoogleCloud';
+import Databricks from './pages/Databricks';
+import Snowflake from './pages/Snowflake';
+import Kubernetes from './pages/Kubernetes';
+import Terraform from './pages/Terraform';
 import Readiness from './pages/Readiness';
+import Pricing from './pages/Pricing';
+import AdminAnalytics from './pages/AdminAnalytics';
+import AdminProInterest from './pages/AdminProInterest';
 import Auth from './pages/Auth';
 
 function App() {
@@ -84,6 +91,14 @@ function App() {
       return <AzureCloud />;
     case '/google-cloud':
       return <GoogleCloud />;
+    case '/databricks':
+      return <Databricks />;
+    case '/snowflake':
+      return <Snowflake />;
+    case '/kubernetes':
+      return <Kubernetes />;
+    case '/terraform':
+      return <Terraform />;
     case '/mock-interviews':
       return <MockInterviews />;
     case '/interview-questions':
@@ -94,6 +109,12 @@ function App() {
       return <Roadmaps />;
     case '/readiness':
       return <Readiness />;
+    case '/pricing':
+      return <Pricing />;
+    case '/admin/analytics':
+      return <AdminAnalytics />;
+    case '/admin/pro-interest':
+      return <AdminProInterest />;
     case '/auth':
       return <Auth />;
     default:

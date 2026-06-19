@@ -1,6 +1,6 @@
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
 import { FiDatabase, FiTerminal, FiGitBranch } from 'react-icons/fi';
-import { SiGooglecloud } from 'react-icons/si';
+import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
 export const READINESS_TRACKS = [
@@ -12,6 +12,10 @@ export const READINESS_TRACKS = [
   { id: 'google', name: 'Google Cloud', icon: SiGooglecloud, path: '/google-cloud' },
   { id: 'shell scripting', name: 'Shell Scripting', icon: FiTerminal, path: '/shell-scripting' },
   { id: 'devops', name: 'DevOps', icon: FiGitBranch, path: '/devops' },
+  { id: 'databricks', name: 'Databricks', icon: SiDatabricks, path: '/databricks' },
+  { id: 'snowflake', name: 'Snowflake', icon: SiSnowflake, path: '/snowflake' },
+  { id: 'kubernetes', name: 'Kubernetes', icon: SiKubernetes, path: '/kubernetes' },
+  { id: 'terraform', name: 'Terraform', icon: SiTerraform, path: '/terraform' },
 ];
 
 export function getTrackById(id) {

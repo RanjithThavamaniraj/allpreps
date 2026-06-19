@@ -1,6 +1,6 @@
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
 import { FiDatabase, FiTerminal, FiGitBranch, FiArrowRight } from 'react-icons/fi';
-import { SiGooglecloud } from 'react-icons/si';
+import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
 const TRACKS = [
@@ -59,6 +59,34 @@ const TRACKS = [
     icon: <FiTerminal />,
     topics: 'Automation • Cron • Bash',
     count: '500+',
+  },
+  {
+    name: 'Databricks',
+    path: '/databricks',
+    icon: <SiDatabricks />,
+    topics: 'Spark • Delta Lake • Unity Catalog',
+    count: '170+',
+  },
+  {
+    name: 'Snowflake',
+    path: '/snowflake',
+    icon: <SiSnowflake />,
+    topics: 'Warehouses • Snowpipe • Time Travel',
+    count: '170+',
+  },
+  {
+    name: 'Kubernetes',
+    path: '/kubernetes',
+    icon: <SiKubernetes />,
+    topics: 'Pods • Services • Helm',
+    count: '170+',
+  },
+  {
+    name: 'Terraform',
+    path: '/terraform',
+    icon: <SiTerraform />,
+    topics: 'IaC • Modules • Remote State',
+    count: '170+',
   },
 ];
 

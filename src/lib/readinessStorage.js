@@ -138,6 +138,10 @@ export function getAllTrackIds() {
     'google',
     'shell scripting',
     'devops',
+    'databricks',
+    'snowflake',
+    'kubernetes',
+    'terraform',
   ];
 }
 

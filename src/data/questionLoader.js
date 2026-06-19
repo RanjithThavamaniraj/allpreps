@@ -54,7 +54,14 @@ export const searchQuestions = (query, filters = {}) => {
       'archive gap': ['dataguard', 'standby', 'transport', 'fal', 'archive logs'],
       'oom': ['memory', 'killer', 'swap', 'linux', 'out of memory'],
       'slow': ['performance', 'tuning', 'explain plan', 'index', 'wait event'],
-      'high availability': ['rac', 'dataguard', 'cluster', 'multi-az']
+      'high availability': ['rac', 'dataguard', 'cluster', 'multi-az'],
+      'delta lake': ['databricks', 'delta', 'lakehouse', 'bronze', 'silver', 'gold', 'unity catalog'],
+      'spark': ['databricks', 'dataframe', 'structured streaming', 'cluster'],
+      'snowflake': ['warehouse', 'virtual warehouse', 'micro partition', 'snowpipe', 'time travel'],
+      'crashloop': ['kubernetes', 'pod', 'container', 'restart', 'liveness'],
+      'ingress': ['kubernetes', 'service', 'tls', 'load balancer'],
+      'terraform state': ['terraform', 'drift', 'backend', 'remote state', 'lock'],
+      'iac': ['terraform', 'module', 'provider', 'provisioner'],
     };
 
     // Expand search query with semantic keywords if a map matches

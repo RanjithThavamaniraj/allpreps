@@ -12,10 +12,16 @@ export const PRODUCTION_SCENARIO_TRACKS = {
   azure: { label: 'Azure', chip: 'azure' },
   google: { label: 'Google Cloud', chip: 'google' },
   'shell scripting': { label: 'Shell Scripting', chip: 'shell' },
+  databricks: { label: 'Databricks', chip: 'databricks' },
+  snowflake: { label: 'Snowflake', chip: 'snowflake' },
+  kubernetes: { label: 'Kubernetes', chip: 'kubernetes' },
+  terraform: { label: 'Terraform', chip: 'terraform' },
 };
 
 export function getScenarioCountForTrack(trackId) {
-  return ALL_QUESTIONS.filter(q => q.category === trackId).length;
+  return ALL_QUESTIONS.filter(
+    q => q.category === trackId && (q.tags || []).includes('production-scenario')
+  ).length;
 }
 
 export function getTotalScenarioCount() {

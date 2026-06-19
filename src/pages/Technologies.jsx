@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaDatabase, FaLinux, FaAws, FaArrowRight } from 'react-icons/fa';
 import { FiDatabase, FiTerminal, FiGitBranch, FiChevronRight } from 'react-icons/fi';
-import { SiGooglecloud } from 'react-icons/si';
+import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
 const TECH_CARDS = [
@@ -86,6 +86,46 @@ const TECH_CARDS = [
     glow: 'rgba(66, 133, 244, 0.4)',
     iconBg: 'rgba(66, 133, 244, 0.1)',
     desc: 'GKE orchestration, Compute Engine, Cloud Spanner, and Google Cloud Load Balancing capabilities.'
+  },
+  {
+    id: 'databricks',
+    name: 'Databricks',
+    path: '/databricks',
+    icon: <SiDatabricks />,
+    accent: '#FF3621',
+    glow: 'rgba(255, 54, 33, 0.4)',
+    iconBg: 'rgba(255, 54, 33, 0.1)',
+    desc: 'Lakehouse architecture, Apache Spark, Delta Lake, Unity Catalog, structured streaming, and workflow orchestration.'
+  },
+  {
+    id: 'snowflake',
+    name: 'Snowflake',
+    path: '/snowflake',
+    icon: <SiSnowflake />,
+    accent: '#29B5E8',
+    glow: 'rgba(41, 181, 232, 0.4)',
+    iconBg: 'rgba(41, 181, 232, 0.1)',
+    desc: 'Virtual warehouses, micro-partitions, Snowpipe ingestion, streams and tasks, RBAC, and data sharing.'
+  },
+  {
+    id: 'kubernetes',
+    name: 'Kubernetes',
+    path: '/kubernetes',
+    icon: <SiKubernetes />,
+    accent: '#326CE5',
+    glow: 'rgba(50, 108, 229, 0.4)',
+    iconBg: 'rgba(50, 108, 229, 0.1)',
+    desc: 'Container orchestration, deployments, services, ingress, storage, RBAC, Helm, and cluster troubleshooting.'
+  },
+  {
+    id: 'terraform',
+    name: 'Terraform',
+    path: '/terraform',
+    icon: <SiTerraform />,
+    accent: '#7B4EBC',
+    glow: 'rgba(123, 78, 188, 0.4)',
+    iconBg: 'rgba(123, 78, 188, 0.1)',
+    desc: 'Infrastructure as Code, providers, modules, remote state, workspaces, and multi-environment deployments.'
   }
 ];
 

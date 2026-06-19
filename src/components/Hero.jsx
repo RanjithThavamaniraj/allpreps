@@ -9,8 +9,8 @@ export default function Hero() {
           <span className="hero-headline-accent">Platform For Engineers</span>
         </h1>
         <p className="hero-sub">
-          Master Oracle DBA, Linux, SQL, AWS, DevOps and cloud technologies with
-          structured learning paths, interview questions and practical
+          Master Oracle DBA, Linux, SQL, AWS, DevOps, Databricks, Snowflake, Kubernetes, Terraform
+          and cloud technologies with structured learning paths, interview questions and practical
           preparation resources.
         </p>
         <div className="hero-actions">
@@ -23,17 +23,17 @@ export default function Hero() {
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">
-            <span className="hero-metric-value">5000+</span>
+            <span className="hero-metric-value">5600+</span>
             <span className="hero-metric-label">Questions</span>
           </div>
           <div className="hero-metric-divider" />
           <div className="hero-metric">
-            <span className="hero-metric-value">50+</span>
+            <span className="hero-metric-value">70+</span>
             <span className="hero-metric-label">Interview Topics</span>
           </div>
           <div className="hero-metric-divider" />
           <div className="hero-metric">
-            <span className="hero-metric-value">8</span>
+            <span className="hero-metric-value">12</span>
             <span className="hero-metric-label">Technologies</span>
           </div>
         </div>

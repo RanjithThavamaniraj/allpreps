@@ -28,7 +28,7 @@ const features = [
   {
     icon: FiLayers,
     title: 'Technology Coverage',
-    desc: '8 technology tracks covering Oracle DBA, Linux, SQL, AWS, DevOps, Azure, GCP, and Shell Scripting.',
+    desc: '12 technology tracks covering Oracle DBA, Linux, SQL, AWS, DevOps, Azure, GCP, Shell Scripting, Databricks, Snowflake, Kubernetes, and Terraform.',
   },
   {
     icon: FiSearch,

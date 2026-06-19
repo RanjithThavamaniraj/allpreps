@@ -9,6 +9,10 @@ export const TECHNOLOGY_TRACKS = [
   { id: 'azure', label: 'Azure', roadmapId: 'azure' },
   { id: 'google', label: 'Google Cloud', roadmapId: 'google' },
   { id: 'shell scripting', label: 'Shell Scripting', roadmapId: 'shell scripting' },
+  { id: 'databricks', label: 'Databricks', roadmapId: 'databricks' },
+  { id: 'snowflake', label: 'Snowflake', roadmapId: 'snowflake' },
+  { id: 'kubernetes', label: 'Kubernetes', roadmapId: 'kubernetes' },
+  { id: 'terraform', label: 'Terraform', roadmapId: 'terraform' },
 ];
 
 export const DIFFICULTY_LEVELS = [
@@ -37,6 +41,10 @@ const CATEGORY_KEYWORDS = [
   { keywords: ['security', 'iam', 'encryption', 'ssh', 'permission'], label: 'Security' },
   { keywords: ['storage', 's3', 'disk', 'volume', 'blob'], label: 'Storage' },
   { keywords: ['kubernetes', 'docker', 'container', 'ci/cd', 'pipeline'], label: 'DevOps & Containers' },
+  { keywords: ['databricks', 'spark', 'delta lake', 'delta table', 'unity catalog', 'lakehouse'], label: 'Databricks & Spark' },
+  { keywords: ['snowflake', 'warehouse', 'snowpipe', 'micro partition', 'virtual warehouse'], label: 'Snowflake Data Cloud' },
+  { keywords: ['pod', 'deployment', 'replicaset', 'ingress', 'helm', 'k8s'], label: 'Kubernetes' },
+  { keywords: ['terraform', 'iac', 'state file', 'remote state', 'module', 'provider'], label: 'Terraform & IaC' },
   { keywords: ['shell', 'bash', 'script', 'cron', 'awk'], label: 'Shell Scripting' },
   { keywords: ['sql', 'query', 'join', 'union', 'transaction'], label: 'SQL Fundamentals' },
   { keywords: ['linux', 'kernel', 'process', 'systemd'], label: 'Linux Administration' },

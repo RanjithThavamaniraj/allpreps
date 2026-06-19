@@ -11,6 +11,9 @@ import {
 } from '../../lib/calculateReadiness';
 import ReadinessCard from './ReadinessCard';
 import ScoreRing from './ScoreRing';
+import SubscriptionCard from '../SubscriptionCard';
+import ReadinessMotivation from '../ReadinessMotivation';
+import InterviewHistoryPanel from '../InterviewHistoryPanel';
 
 export default function ReadinessDashboard() {
   const [data, setData] = useState(() => getUserData());
@@ -54,6 +57,8 @@ export default function ReadinessDashboard() {
         </div>
       </header>
 
+      <SubscriptionCard />
+
       {trackedCount > 0 ? (
         <div className="readiness-overall-card">
           <div className="readiness-overall-ring">
@@ -65,6 +70,7 @@ export default function ReadinessDashboard() {
             <p className="readiness-overall-hint">
               Scores combine roadmap progress (40%) and mock interview results (60%).
             </p>
+            <ReadinessMotivation currentScore={average} />
           </div>
         </div>
       ) : (
@@ -76,6 +82,8 @@ export default function ReadinessDashboard() {
           </div>
         </div>
       )}
+
+      <InterviewHistoryPanel />
 
       {filterTrack && (
         <p className="readiness-filter-note">

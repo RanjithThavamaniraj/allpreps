@@ -6,7 +6,7 @@ import { saveRoadmapProgress } from '../lib/readinessStorage';
 import { getGlobalCompletedIds, subscribeToProgress } from '../lib/trackProgress';
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
 import { FiDatabase, FiTerminal, FiGitBranch, FiAward, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { SiGooglecloud } from 'react-icons/si';
+import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
 const TRACKS = [
@@ -18,6 +18,10 @@ const TRACKS = [
   { id: 'google', name: 'Google Cloud', icon: <SiGooglecloud /> },
   { id: 'shell scripting', name: 'Shell Scripting', icon: <FiTerminal /> },
   { id: 'devops', name: 'DevOps', icon: <FiGitBranch /> },
+  { id: 'databricks', name: 'Databricks', icon: <SiDatabricks /> },
+  { id: 'snowflake', name: 'Snowflake', icon: <SiSnowflake /> },
+  { id: 'kubernetes', name: 'Kubernetes', icon: <SiKubernetes /> },
+  { id: 'terraform', name: 'Terraform', icon: <SiTerraform /> },
 ];
 
 export default function Roadmaps() {
