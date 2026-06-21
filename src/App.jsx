@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Home from './pages/Home';
 import MockInterviews from './pages/MockInterviews';
 import InterviewQuestions from './pages/InterviewQuestions';
@@ -6,7 +6,8 @@ import Technologies from './pages/Technologies';
 import Roadmaps from './pages/Roadmaps';
 import OracleDBA from './pages/OracleDBA';
 import LinuxAdmin from './pages/LinuxAdmin';
-import SQLAdmin from './pages/SQLAdmin';
+import PostgreSQL from './pages/PostgreSQL';
+import MySQL from './pages/MySQL';
 import AWSCloud from './pages/AWSCloud';
 import ShellScripting from './pages/ShellScripting';
 import DevOps from './pages/DevOps';
@@ -21,106 +22,102 @@ import Pricing from './pages/Pricing';
 import AdminAnalytics from './pages/AdminAnalytics';
 import AdminProInterest from './pages/AdminProInterest';
 import Auth from './pages/Auth';
+import { getRouteKey, scrollToHash } from './lib/navigation';
+
+function dispatchNavigate() {
+  window.dispatchEvent(new Event('allpreps-navigate'));
+}
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [routeKey, setRouteKey] = useState(getRouteKey);
 
-  useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname);
-    };
-    window.addEventListener('popstate', handleLocationChange);
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-    };
+  const syncLocation = useCallback(() => {
+    setCurrentPath(window.location.pathname);
+    setRouteKey(getRouteKey());
+    dispatchNavigate();
   }, []);
 
-  // Intercept anchor clicks to avoid full page reload
+  useEffect(() => {
+    window.addEventListener('popstate', syncLocation);
+    return () => window.removeEventListener('popstate', syncLocation);
+  }, [syncLocation]);
+
   useEffect(() => {
     const handleAnchorClick = (e) => {
       const anchor = e.target.closest('a');
-      if (anchor && anchor.href && anchor.host === window.location.host) {
-        const url = new URL(anchor.href);
-        const path = url.pathname;
-        
-        // Handle routes, ignore hash links (anchors) or external links
-        if (path !== '/' || !url.hash) {
-          e.preventDefault();
-          window.history.pushState({}, '', path + url.hash);
-          setCurrentPath(path);
-          // If there is a hash, scroll to it, otherwise scroll to top
-          if (url.hash) {
-            const id = url.hash.slice(1);
-            let retries = 8;
-            const attemptScroll = () => {
-              const el = document.getElementById(id);
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
-              } else if (retries > 0) {
-                retries--;
-                setTimeout(attemptScroll, 80);
-              }
-            };
-            attemptScroll();
-          } else {
-            window.scrollTo(0, 0);
-          }
-        }
+      if (!anchor?.href || anchor.host !== window.location.host) return;
+      if (anchor.target === '_blank') return;
+
+      const url = new URL(anchor.href);
+      const nextUrl = url.pathname + url.search + url.hash;
+
+      e.preventDefault();
+      window.history.pushState({}, '', nextUrl);
+      setCurrentPath(url.pathname);
+      setRouteKey(url.pathname + url.search);
+      dispatchNavigate();
+
+      if (url.hash) {
+        requestAnimationFrame(() => scrollToHash(url.hash));
+      } else {
+        window.scrollTo(0, 0);
       }
     };
+
     document.addEventListener('click', handleAnchorClick);
-    return () => {
-      document.removeEventListener('click', handleAnchorClick);
-    };
+    return () => document.removeEventListener('click', handleAnchorClick);
   }, []);
 
   switch (currentPath) {
     case '/oracle-dba':
-      return <OracleDBA />;
+      return <OracleDBA key={routeKey} />;
     case '/linux-admin':
-      return <LinuxAdmin />;
+      return <LinuxAdmin key={routeKey} />;
     case '/sql-admin':
-      return <SQLAdmin />;
+    case '/postgresql':
+      return <PostgreSQL key={routeKey} />;
+    case '/mysql':
+      return <MySQL key={routeKey} />;
     case '/aws-cloud':
-      return <AWSCloud />;
+      return <AWSCloud key={routeKey} />;
     case '/shell-scripting':
-      return <ShellScripting />;
+      return <ShellScripting key={routeKey} />;
     case '/devops':
-      return <DevOps />;
+      return <DevOps key={routeKey} />;
     case '/azure-cloud':
-      return <AzureCloud />;
+      return <AzureCloud key={routeKey} />;
     case '/google-cloud':
-      return <GoogleCloud />;
+      return <GoogleCloud key={routeKey} />;
     case '/databricks':
-      return <Databricks />;
+      return <Databricks key={routeKey} />;
     case '/snowflake':
-      return <Snowflake />;
+      return <Snowflake key={routeKey} />;
     case '/kubernetes':
-      return <Kubernetes />;
+      return <Kubernetes key={routeKey} />;
     case '/terraform':
-      return <Terraform />;
+      return <Terraform key={routeKey} />;
     case '/mock-interviews':
-      return <MockInterviews />;
+      return <MockInterviews key={routeKey} />;
     case '/interview-questions':
-      return <InterviewQuestions />;
+      return <InterviewQuestions key={routeKey} />;
     case '/technologies':
-      return <Technologies />;
+      return <Technologies key={routeKey} />;
     case '/roadmaps':
-      return <Roadmaps />;
+      return <Roadmaps key={routeKey} />;
     case '/readiness':
-      return <Readiness />;
+      return <Readiness key={routeKey} />;
     case '/pricing':
-      return <Pricing />;
+      return <Pricing key={routeKey} />;
     case '/admin/analytics':
-      return <AdminAnalytics />;
+      return <AdminAnalytics key={routeKey} />;
     case '/admin/pro-interest':
-      return <AdminProInterest />;
+      return <AdminProInterest key={routeKey} />;
     case '/auth':
-      return <Auth />;
+      return <Auth key={routeKey} />;
     default:
-      return <Home />;
+      return <Home key={routeKey} />;
   }
 }
 
 export default App;
-

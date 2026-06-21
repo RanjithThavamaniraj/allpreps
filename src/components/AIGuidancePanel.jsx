@@ -22,6 +22,24 @@ export default function AIGuidancePanel({ question, tags }) {
   // Mock Generators
 
   const getExplainContent = (level, q) => {
+    const tagStr = (tags || []).join(' ').toLowerCase();
+    const isPostgres = tagStr.includes('postgresql') || tagStr.includes('postgres');
+    const isMysql = tagStr.includes('mysql') || tagStr.includes('innodb');
+
+    if (isPostgres) {
+      if (level === 'Beginner') return `PostgreSQL fundamentals for "${q}": focus on process architecture, MVCC visibility, and how queries map to EXPLAIN output. Mention pg_stat_* views for monitoring.`;
+      if (level === 'Intermediate') return `Intermediate PostgreSQL answer for "${q}": cover WAL durability, autovacuum/bloat, index choice (B-tree vs GIN), and replication lag metrics from pg_stat_replication.`;
+      if (level === 'Senior Engineer') return `Senior PostgreSQL depth on "${q}": discuss lock modes, isolation anomalies, checkpoint tuning, partition pruning, and HA failover with Patroni/repmgr trade-offs.`;
+      return `Production PostgreSQL incident for "${q}": prioritize pg_stat_activity, lock waits, replication slot lag, and disk usage on pg_wal before schema changes.`;
+    }
+
+    if (isMysql) {
+      if (level === 'Beginner') return `MySQL fundamentals for "${q}": explain InnoDB vs MyISAM, connection/thread model, and basic SHOW commands (PROCESSLIST, ENGINE INNODB STATUS).`;
+      if (level === 'Intermediate') return `Intermediate MySQL answer for "${q}": reference binary logs, ROW vs STATEMENT replication, EXPLAIN output, and slow query log analysis.`;
+      if (level === 'Senior Engineer') return `Senior MySQL depth on "${q}": cover GTID failover, buffer pool sizing, metadata locks, Group Replication quorum, and backup/restore with XtraBackup.`;
+      return `Production MySQL incident for "${q}": check SHOW REPLICA STATUS, InnoDB lock waits, disk on binlog volume, and connection limits before killing threads.`;
+    }
+
     if (level === 'Beginner') return `Let's break this down simply: Imagine ${q} is like organizing a library. Instead of looking through every book, we use an index card (the index) to find exactly what we need quickly.`;
     if (level === 'Intermediate') return `At an intermediate level, understanding ${q} involves recognizing how the database engine optimizes the execution plan to reduce disk I/O.`;
     if (level === 'Senior Engineer') return `For a senior role, you must articulate the internal locking mechanisms, buffer cache impacts, and how ${q} behaves under extreme high-concurrency workloads.`;
@@ -32,8 +50,15 @@ export default function AIGuidancePanel({ question, tags }) {
     return `Critical Alert at 2 AM:\n\n"The standby database has stopped applying archive logs, and the primary mount point is filling up rapidly due to ${q}."\n\nWhat are your immediate first 3 troubleshooting steps before calling the lead engineer?`;
   };
 
-  const getDeepDiveContent = (tags) => {
-    return `Deep Dive Map for [${tags.join(', ')}]:\n\n1. Core Architecture Layer\n2. Background Processes\n3. Memory Structures\n4. Common Wait Events\n5. Production Tuning Best Practices`;
+  const getDeepDiveContent = (tagList) => {
+    const tagStr = (tagList || []).join(' ').toLowerCase();
+    if (tagStr.includes('postgresql') || tagStr.includes('postgres')) {
+      return `PostgreSQL Deep Dive Map:\n\n1. Process & Memory Architecture\n2. MVCC, WAL & Checkpointing\n3. Vacuum, Bloat & Autovacuum\n4. Index Types & Partitioning\n5. Streaming & Logical Replication\n6. Backup, PITR & HA Failover`;
+    }
+    if (tagStr.includes('mysql')) {
+      return `MySQL Deep Dive Map:\n\n1. InnoDB Storage Engine\n2. Binary Logs & GTID Replication\n3. Indexing & Query Optimization\n4. Buffer Pool & I/O Tuning\n5. Backup (XtraBackup) & PITR\n6. Group Replication & HA Failover`;
+    }
+    return `Deep Dive Map for [${tagList.join(', ')}]:\n\n1. Core Architecture Layer\n2. Background Processes\n3. Memory Structures\n4. Common Wait Events\n5. Production Tuning Best Practices`;
   };
 
   

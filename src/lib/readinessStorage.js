@@ -118,6 +118,19 @@ function migrateLegacyCompletedQuestions(data) {
       }
     }
 
+    // Migrate legacy generic SQL progress to PostgreSQL
+    const sqlLegacy = updated.roadmapProgress['sql'];
+    if (sqlLegacy?.checkedQuestions?.length) {
+      const pgTotal = ALL_QUESTIONS.filter(q => q.category === 'postgresql').length;
+      const pgExisting = updated.roadmapProgress.postgresql?.checkedQuestions ?? [];
+      updated.roadmapProgress.postgresql = {
+        checkedQuestions: [...new Set([...pgExisting, ...sqlLegacy.checkedQuestions])],
+        totalQuestions: pgTotal,
+      };
+      delete updated.roadmapProgress.sql;
+      changed = true;
+    }
+
     return changed ? updated : data;
   } catch {
     return data;
@@ -131,8 +144,9 @@ function migrateLegacyCompletedQuestions(data) {
 export function getAllTrackIds() {
   return [
     'oracle dba',
+    'postgresql',
+    'mysql',
     'linux',
-    'sql',
     'aws',
     'azure',
     'google',

@@ -1,0 +1,66 @@
+// PostgreSQL — performance
+// Structured interview content — run: node scripts/generate-db-tracks.mjs
+// 5 questions
+
+export const questions = [
+  {
+    id: "pg-query-optimization-1",
+    technology: "postgresql",
+    category: "postgresql",
+    difficulty: "easy",
+    frequency: "Very Common",
+    role: "Database Engineer",
+    question: "Walk through systematic PostgreSQL query optimization using EXPLAIN ANALYZE.",
+    answer: "## Interview Answer\nCapture query from pg_stat_statements. Run EXPLAIN (ANALYZE, BUFFERS, VERBOSE) — compare estimated vs actual rows. Identify seq scans on large tables, nested loops with high loops count, hash/sort spills to temp. Fix: indexes, stats, query rewrite, work_mem session tuning.\n\n## Detailed Explanation\nBuffers: shared hit vs read shows cache effectiveness. Timing per node localizes cost. Rows Removed by Filter indicates index inefficiency. Planning time vs execution time — prepared statement caching. auto_explain in production for slow query capture.\n\n## Production Perspective\nTop query 40% DB time — EXPLAIN showed Nested Loop 2M loops. Missing index on line_items.order_id. CREATE INDEX CONCURRENTLY; mean time 120ms → 4ms.\n\n## Common Follow-up Questions\n• BUFFERS shared read vs local?\n• When EXPLAIN ANALYZE modifies data?\n• Generic vs custom plan prepared statements?\n• pg_qualstats for predicate analysis?\n\n## Common Mistakes\n• EXPLAIN without ANALYZE guessing at runtime cost\n• Fixing query in prod without testing on staging clone\n• Adding index before checking existing redundant indexes\n• Ignoring Rows Removed by Filter metric\n\n## Senior Engineer Insights\nOptimization loop: pg_stat_statements → EXPLAIN ANALYZE → fix → reset stats → verify mean_time drop.\n\n## Key Commands\n• CREATE EXTENSION pg_stat_statements;\n• EXPLAIN (ANALYZE, BUFFERS, VERBOSE) SELECT ...;\n• SELECT query, calls, mean_exec_time, rows FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;\n\n## Best Practices\n• Always use EXPLAIN (ANALYZE, BUFFERS) for investigation\n• Compare estimated vs actual rows at each plan node\n• Verify fix impact in pg_stat_statements after deploy\n• Enable auto_explain for queries exceeding threshold",
+    command: "CREATE EXTENSION pg_stat_statements;\nEXPLAIN (ANALYZE, BUFFERS, VERBOSE) SELECT ...;\nSELECT query, calls, mean_exec_time, rows FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;",
+    tags: ["postgresql","query-optimization","easy","very-common"],
+  },
+  {
+    id: "pg-query-optimization-2",
+    technology: "postgresql",
+    category: "postgresql",
+    difficulty: "medium",
+    frequency: "Common",
+    role: "DBA",
+    question: "Use pg_stat_statements for workload analysis and regression detection.",
+    answer: "## Interview Answer\npg_stat_statements normalizes queries tracking calls, total_time, mean_time, rows, shared_blks_read, temp_blks_written. queryid groups identical plans. Identify top total_exec_time consumers first — not just mean_time. Reset stats after optimization to measure delta.\n\n## Detailed Explanation\nRequires shared_preload_libraries. track_io_timing adds IO wait. pg_stat_statements_info tracks reset timestamp. Compare snapshots exported to Prometheus. Hypothetical indexes via hypopg before CREATE. pg_store_plans saves plan history.\n\n## Production Perspective\nWeekly pg_stat_statements export — detected new deploy query with temp_blks_written spike. work_mem bump for report role + query rewrite eliminated 50GB temp files daily.\n\n## Common Follow-up Questions\n• pg_stat_statements vs pg_stat_activity?\n• Query normalization limitations?\n• track_planning option PG 13+?\n• Reset stats safely in production?\n\n## Common Mistakes\n• Optimizing high mean_time but low call count queries first\n• Not recording baseline before change\n• shared_preload_libraries missing after restart\n• Ignoring temp_blks_written leading indicator\n\n## Senior Engineer Insights\nRank by total_exec_time = mean × calls — the 50ms query called 10M times beats 5s query called 100 times.\n\n## Key Commands\n• SELECT query, calls, mean_exec_time, total_exec_time, shared_blks_read, temp_blks_written FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 20;\n• SELECT pg_stat_statements_reset();\n• SELECT * FROM pg_stat_statements_info;\n\n## Best Practices\n• Export pg_stat_statements metrics to monitoring weekly\n• Prioritize by total_exec_time not mean alone\n• Capture baseline before optimization changes\n• Enable track_io_timing for IO-bound analysis",
+    command: "SELECT query, calls, mean_exec_time, total_exec_time, shared_blks_read, temp_blks_written FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 20;\nSELECT pg_stat_statements_reset();\nSELECT * FROM pg_stat_statements_info;",
+    tags: ["postgresql","query-optimization","medium","common"],
+  },
+  {
+    id: "pg-query-optimization-3",
+    technology: "postgresql",
+    category: "postgresql",
+    difficulty: "medium",
+    frequency: "Very Common",
+    role: "Production Support",
+    question: "Identify and fix N+1 query patterns and ORM-generated inefficient SQL.",
+    answer: "## Interview Answer\nN+1: loop fetching parent then child per row — shows as many identical queries in pg_stat_activity. Fix: JOIN, WHERE IN batch, ORM eager loading (select_related/prefetch). ORM issues: SELECT *, implicit casts, OFFSET pagination on large tables, lack of LIMIT on relations.\n\n## Detailed Explanation\npg_stat_statements high calls + low rows per call signals N+1. application_name tags help trace to service. Prepared statements may hide in ORM logs — use log_min_duration_statement. Keyset pagination preferred over OFFSET for deep pages.\n\n## Production Perspective\nAPI p99 spike — pg_stat_statements showed 500 calls/sec SELECT * FROM comments WHERE post_id=$1. Django prefetch_related fix reduced to 2 queries per request; p99 800ms → 45ms.\n\n## Common Follow-up Questions\n• Lazy vs eager loading trade-offs?\n• WHERE IN vs JOIN performance?\n• Cursor-based pagination implementation?\n• ORM partial index utilization?\n\n## Common Mistakes\n• Database index on FK without ORM eager load fix\n• OFFSET 100000 pagination on social feed\n• SELECT * returning large TOAST columns unnecessarily\n• Blaming PostgreSQL before checking ORM query log\n\n## Senior Engineer Insights\nN+1 is app pattern — show pg_stat_statements calls metric as detection signal.\n\n## Key Commands\n• SELECT query, calls, rows/calls AS rows_per_call FROM pg_stat_statements WHERE query LIKE '%comments%' ORDER BY calls DESC;\n• EXPLAIN ANALYZE SELECT * FROM comments WHERE post_id = ANY($1::int[]);\n\n## Best Practices\n• Tag connections with application_name per service\n• Monitor queries with calls > 1000/min and rows/call < 5\n• Use batch loading or JOIN in ORM configuration\n• Prefer keyset pagination for large offsets",
+    command: "SELECT query, calls, rows/calls AS rows_per_call FROM pg_stat_statements WHERE query LIKE '%comments%' ORDER BY calls DESC;\nEXPLAIN ANALYZE SELECT * FROM comments WHERE post_id = ANY($1::int[]);",
+    tags: ["postgresql","query-optimization","medium","very-common"],
+  },
+  {
+    id: "pg-query-optimization-4",
+    technology: "postgresql",
+    category: "postgresql",
+    difficulty: "hard",
+    frequency: "Common",
+    role: "Database Engineer",
+    question: "Optimize JSONB queries and avoid sequential scans on document columns.",
+    answer: "## Interview Answer\nUse GIN with jsonb_path_ops for @> containment. Expression indexes on ->> extracted fields for equality filters. jsonb_each for ad-hoc — not indexable. Select only needed keys not entire document. TOAST stores large jsonb — fetching full column expensive.\n\n## Detailed Explanation\nCREATE INDEX ON t ((data->>'status')) for WHERE data->>'status' = 'active'. statistics on expressions need ANALYZE. jsonb_populate_record for structured access. Avoid OR across many jsonb paths — separate indexed generated columns better.\n\n## Production Perspective\nWHERE data @> '{\"type\":\"premium\"}' seq scanned — GIN jsonb_path_ops index + partial on active records. Combined with generated column status extracted for reporting filter.\n\n## Common Follow-up Questions\n• JSON_TABLE PG 17+ vs jsonb_each?\n• TOAST threshold tuning?\n• jsonb vs normalized schema trade-off?\n• Immutable function requirement for jsonb index?\n\n## Common Mistakes\n• B-tree on entire jsonb column\n• data->key without GIN for containment\n• Returning full jsonb blob in list API\n• No statistics on expression index column\n\n## Senior Engineer Insights\nExtract hot filter fields to generated STORED columns — cleaner than complex GIN for mixed workload.\n\n## Key Commands\n• CREATE INDEX idx_data_gin ON t USING gin (data jsonb_path_ops);\n• ALTER TABLE t ADD COLUMN status text GENERATED ALWAYS AS (data->>'status') STORED;\n• CREATE INDEX idx_status ON t (status);\n• EXPLAIN SELECT id FROM t WHERE data @> '{\"type\":\"premium\"}';\n\n## Best Practices\n• GIN for containment; B-tree/expression for equality on extracted fields\n• Minimize jsonb column width in SELECT lists\n• Use generated columns for frequently filtered keys\n• ANALYZE after adding jsonb indexes",
+    command: "CREATE INDEX idx_data_gin ON t USING gin (data jsonb_path_ops);\nALTER TABLE t ADD COLUMN status text GENERATED ALWAYS AS (data->>'status') STORED;\nCREATE INDEX idx_status ON t (status);\nEXPLAIN SELECT id FROM t WHERE data @> '{\"type\":\"premium\"}';",
+    tags: ["postgresql","query-optimization","hard","common"],
+  },
+  {
+    id: "pg-query-optimization-5",
+    technology: "postgresql",
+    category: "postgresql",
+    difficulty: "hard",
+    frequency: "Rare",
+    role: "Cloud Engineer",
+    question: "Lead performance incident: database CPU 100% — structured triage approach.",
+    answer: "## Interview Answer\n1) pg_stat_activity: active queries, wait_events. 2) pg_stat_statements: top total_time last reset. 3) Check replication lag, autovacuum, checkpoints concurrently. 4) EXPLAIN active query. 5) Mitigate: cancel query, pg_terminate_backend, statement_timeout, route read to replica. 6) Root fix: index, rewrite, scale.\n\n## Detailed Explanation\nCPU 100% causes: missing index seq scans, parallel query storm, excessive connection count, autovacuum anti-wraparound, cryptographic functions in query, PL/pgSQL tight loops. RDS Performance Insights maps wait events. Not always query — check connection count and background workers.\n\n## Production Perspective\nBlack Friday CPU pegged — pg_stat_activity showed 200 identical unindexed facet search queries. Emergency CREATE INDEX CONCURRENTLY on products(category, brand); cancelled runaway reporting session; CPU 95% → 40% in 8 minutes.\n\n## Common Follow-up Questions\n• wait_event CPU vs IO vs Lock?\n• When to fail over vs fix in place?\n• Connection storm vs query storm differentiation?\n• PgBouncer queue during CPU saturation?\n\n## Common Mistakes\n• Restart PostgreSQL as first action losing diagnostic state\n• Scaling CPU without identifying query root cause\n• Killing autovacuum during wraparound risk\n• No pg_stat_statements enabled pre-incident\n\n## Senior Engineer Insights\nIncident command answer: observe → identify top query → mitigate → fix → postmortem with pg_stat_statements snapshot.\n\n## Key Commands\n• SELECT pid, now()-query_start AS dur, state, wait_event_type, wait_event, left(query,80) FROM pg_stat_activity WHERE state='active';\n• SELECT pg_cancel_backend(pid);\n• SELECT query, total_exec_time FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 5;\n\n## Best Practices\n• Maintain pg_stat_statements always enabled\n• Runbook for CPU incidents with ordered diagnostic queries\n• Set statement_timeout globally with override role\n• Post-incident: index/query fix ticket from captured plans",
+    command: "SELECT pid, now()-query_start AS dur, state, wait_event_type, wait_event, left(query,80) FROM pg_stat_activity WHERE state='active';\nSELECT pg_cancel_backend(pid);\nSELECT query, total_exec_time FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 5;",
+    tags: ["postgresql","query-optimization","hard","rare"],
+  }
+];

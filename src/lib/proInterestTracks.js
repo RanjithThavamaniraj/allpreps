@@ -1,7 +1,8 @@
 /** Technology track options for Pro Early Access form */
 export const PRO_INTEREST_TRACKS = [
   'Oracle DBA',
-  'SQL',
+  'PostgreSQL',
+  'MySQL',
   'Linux',
   'AWS',
   'Azure',
@@ -26,6 +27,8 @@ export function trackLabelToProInterest(label) {
     'AWS': 'AWS',
     'Shell Scripting': 'DevOps',
     'Oracle DBA': 'Oracle DBA',
+    'PostgreSQL': 'PostgreSQL',
+    'MySQL': 'MySQL',
   };
   return map[label] || label;
 }

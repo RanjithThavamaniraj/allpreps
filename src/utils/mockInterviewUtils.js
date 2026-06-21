@@ -2,8 +2,9 @@ import { ALL_QUESTIONS } from '../data/questionLoader';
 
 export const TECHNOLOGY_TRACKS = [
   { id: 'oracle dba', label: 'Oracle DBA', roadmapId: 'oracle dba' },
+  { id: 'postgresql', label: 'PostgreSQL', roadmapId: 'postgresql' },
+  { id: 'mysql', label: 'MySQL', roadmapId: 'mysql' },
   { id: 'linux', label: 'Linux Admin', roadmapId: 'linux' },
-  { id: 'sql', label: 'SQL', roadmapId: 'sql' },
   { id: 'aws', label: 'AWS', roadmapId: 'aws' },
   { id: 'devops', label: 'DevOps', roadmapId: 'devops' },
   { id: 'azure', label: 'Azure', roadmapId: 'azure' },
@@ -47,6 +48,8 @@ const CATEGORY_KEYWORDS = [
   { keywords: ['terraform', 'iac', 'state file', 'remote state', 'module', 'provider'], label: 'Terraform & IaC' },
   { keywords: ['shell', 'bash', 'script', 'cron', 'awk'], label: 'Shell Scripting' },
   { keywords: ['sql', 'query', 'join', 'union', 'transaction'], label: 'SQL Fundamentals' },
+  { keywords: ['postgresql', 'postgres', 'mvcc', 'vacuum', 'wal', 'pg_stat'], label: 'PostgreSQL' },
+  { keywords: ['mysql', 'innodb', 'myisam', 'binlog', 'gtid', 'buffer pool'], label: 'MySQL' },
   { keywords: ['linux', 'kernel', 'process', 'systemd'], label: 'Linux Administration' },
 ];
 

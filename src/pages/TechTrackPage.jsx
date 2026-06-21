@@ -1,12 +1,16 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { FiArrowLeft, FiSearch } from 'react-icons/fi';
 import { getQuestionsByTech } from '../data/questionLoader';
 import Navbar from '../components/Navbar';
 import QuestionCard from '../components/QuestionCard';
+import QuestionProgressSummary from '../components/QuestionProgressSummary';
 import Footer from '../components/Footer';
 import ProductionScenariosCallout from '../components/ProductionScenariosCallout';
 import ReadinessTechStrip from '../components/ReadinessScore/ReadinessTechStrip';
+import TrackLearningPath from '../components/TrackLearningPath';
+import PracticeTestSection from '../components/PracticeTestSection';
 import { getGlobalCompletedIds, subscribeToProgress, toggleTrackQuestion } from '../lib/trackProgress';
+import { mapQuestionForCard, SEARCH_PLACEHOLDER } from '../lib/questionMeta';
 
 export default function TechTrackPage({
   trackId,
@@ -15,13 +19,18 @@ export default function TechTrackPage({
   description,
   icon,
   iconStyle = {},
-  searchPlaceholder,
+  searchPlaceholder = SEARCH_PLACEHOLDER,
   stats = [],
   emptyTitle,
+  learningPathSteps,
+  showPracticeTests = false,
+  trackDisplayName,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [completedIds, setCompletedIds] = useState(() => getGlobalCompletedIds());
   const [difficultyFilter, setDifficultyFilter] = useState('all');
+  const [practiceLimit, setPracticeLimit] = useState(null);
+  const questionsRef = useRef(null);
 
   useEffect(() => {
     const syncCompleted = () => setCompletedIds(getGlobalCompletedIds());
@@ -41,20 +50,17 @@ export default function TechTrackPage({
   };
 
   const trackQuestions = useMemo(() => {
-    return getQuestionsByTech(trackId).map(q => ({
-      id: `${idPrefix}-${q.id}`,
-      rawId: q.id,
-      title: q.question,
-      difficulty: q.difficulty,
-      description: q.question,
-      details: q.answer,
-      solution: q.command,
-      tags: q.tags || [trackId],
-    }));
+    return getQuestionsByTech(trackId).map(q => mapQuestionForCard(q, idPrefix, trackId));
   }, [trackId, idPrefix]);
 
+  const progressStats = useMemo(() => {
+    const total = trackQuestions.length;
+    const completed = trackQuestions.filter(q => completedIds.includes(q.rawId)).length;
+    return { total, completed };
+  }, [trackQuestions, completedIds]);
+
   const filteredQuestions = useMemo(() => {
-    return trackQuestions.filter((q) => {
+    let list = trackQuestions.filter((q) => {
       const matchesDifficulty = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
       const matchesSearch =
         !searchQuery ||
@@ -63,7 +69,23 @@ export default function TechTrackPage({
         q.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesDifficulty && matchesSearch;
     });
-  }, [trackQuestions, searchQuery, difficultyFilter]);
+    if (practiceLimit) {
+      list = list.slice(0, practiceLimit);
+    }
+    return list;
+  }, [trackQuestions, searchQuery, difficultyFilter, practiceLimit]);
+
+  const handleStartPractice = (level) => {
+    setDifficultyFilter(level);
+    setPracticeLimit(10);
+    setSearchQuery('');
+    questionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleDifficultyChange = (level) => {
+    setDifficultyFilter(level);
+    setPracticeLimit(null);
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -116,9 +138,41 @@ export default function TechTrackPage({
 
         <ReadinessTechStrip trackId={trackId} />
 
-        <section style={{ padding: '40px 0 20px' }}>
+        {learningPathSteps?.length > 0 && (
+          <TrackLearningPath steps={learningPathSteps} trackName={trackDisplayName || title.replace(' Track', '')} />
+        )}
+
+        {showPracticeTests && (
+          <PracticeTestSection
+            trackName={trackDisplayName || title.replace(' Track', '')}
+            trackId={trackId}
+            onStartPractice={handleStartPractice}
+          />
+        )}
+
+        <section style={{ padding: '40px 0 20px' }} ref={questionsRef} id="questions">
           <div className="container">
-            <div className="questions-header-block" style={{ marginBottom: '24px' }}>
+            {practiceLimit && (
+              <div className="practice-test-active-banner">
+                Practice mode — showing {practiceLimit} {difficultyFilter} questions.{' '}
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setPracticeLimit(null); setDifficultyFilter('all'); }}>
+                  Show all
+                </button>
+              </div>
+            )}
+            <div style={{ marginBottom: '16px' }}>
+              <span className="section-eyebrow">Question Explorer</span>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '6px' }}>
+                {filteredQuestions.length} question{filteredQuestions.length !== 1 ? 's' : ''} in this view
+              </p>
+            </div>
+            <QuestionProgressSummary
+              completed={progressStats.completed}
+              total={progressStats.total}
+              label={`${trackDisplayName || title} progress`}
+            />
+
+            <div className="questions-header-block" style={{ marginBottom: '24px', marginTop: '20px' }}>
               <div className="hero-search-wrap" style={{ flex: '1', maxWidth: '480px' }}>
                 <FiSearch className="search-icon-pos" />
                 <input
@@ -134,7 +188,7 @@ export default function TechTrackPage({
                 {['all', 'easy', 'medium', 'hard'].map((level) => (
                   <button
                     key={level}
-                    onClick={() => setDifficultyFilter(level)}
+                    onClick={() => handleDifficultyChange(level)}
                     className={`btn btn-sm ${
                       difficultyFilter === level ? 'btn-primary' : 'btn-secondary'
                     }`}

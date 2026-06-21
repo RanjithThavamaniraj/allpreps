@@ -1,4 +1,4 @@
-import { FiBookOpen, FiLayers, FiAward } from 'react-icons/fi';
+import { FiBookOpen, FiLayers, FiAward, FiArrowRight } from 'react-icons/fi';
 
 const tiers = [
   {
@@ -31,8 +31,18 @@ export default function LearningPath() {
   return (
     <section className="lp-section" id="learning-path">
       <div className="container">
-        <p className="lp-eyebrow">LEARNING PATH</p>
-        <h2 className="lp-title">Structured Preparation Roadmap</h2>
+        <div className="lp-header">
+          <div className="lp-header-copy">
+            <p className="lp-eyebrow">Learning Path</p>
+            <h2 className="lp-title">Structured Preparation Roadmap</h2>
+            <p className="lp-subtitle">
+              Progress from fundamentals to production mastery across every technology track.
+            </p>
+          </div>
+          <a className="lp-cta" href="/roadmaps">
+            View Full Roadmap <FiArrowRight size={14} />
+          </a>
+        </div>
 
         <div className="lp-roadmap">
           {tiers.map((tier, index) => {
@@ -49,10 +59,6 @@ export default function LearningPath() {
             );
           })}
         </div>
-
-        <a className="lp-cta" href="/roadmaps">
-          View Full Roadmap →
-        </a>
       </div>
     </section>
   );

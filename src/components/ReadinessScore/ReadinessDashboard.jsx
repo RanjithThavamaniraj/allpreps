@@ -17,17 +17,26 @@ import InterviewHistoryPanel from '../InterviewHistoryPanel';
 
 export default function ReadinessDashboard() {
   const [data, setData] = useState(() => getUserData());
-  const filterTrack = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('track') || null;
-  }, []);
+  const [locationSearch, setLocationSearch] = useState(() => window.location.search);
 
   useEffect(() => {
     setData(getUserData());
     const refresh = () => setData(getUserData());
+    const syncLocation = () => setLocationSearch(window.location.search);
     window.addEventListener('allpreps-readiness-updated', refresh);
-    return () => window.removeEventListener('allpreps-readiness-updated', refresh);
+    window.addEventListener('popstate', syncLocation);
+    window.addEventListener('allpreps-navigate', syncLocation);
+    return () => {
+      window.removeEventListener('allpreps-readiness-updated', refresh);
+      window.removeEventListener('popstate', syncLocation);
+      window.removeEventListener('allpreps-navigate', syncLocation);
+    };
   }, []);
+
+  const filterTrack = useMemo(() => {
+    const params = new URLSearchParams(locationSearch);
+    return params.get('track') || null;
+  }, [locationSearch]);
 
   const trackIds = READINESS_TRACKS.map(t => t.id);
   const { average, trackedCount } = calculateOverallReadiness(data, trackIds);

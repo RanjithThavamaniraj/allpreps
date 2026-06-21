@@ -1,12 +1,13 @@
 import { ALL_QUESTIONS } from '../data/questionLoader';
 
-/** Existing AI Guide entry point — Interview Questions practice section */
-export const PRODUCTION_SCENARIOS_URL = '/interview-questions#practice';
+/** Production scenario question bank entry point */
+export const PRODUCTION_SCENARIOS_URL = '/interview-questions?filter=production-scenarios#practice';
 
 export const PRODUCTION_SCENARIO_TRACKS = {
   'oracle dba': { label: 'Oracle DBA', chip: 'oracle' },
+  postgresql: { label: 'PostgreSQL', chip: 'postgresql' },
+  mysql: { label: 'MySQL', chip: 'mysql' },
   linux: { label: 'Linux Admin', chip: 'linux' },
-  sql: { label: 'SQL', chip: 'sql' },
   aws: { label: 'AWS', chip: 'aws' },
   devops: { label: 'DevOps', chip: 'devops' },
   azure: { label: 'Azure', chip: 'azure' },
@@ -18,14 +19,18 @@ export const PRODUCTION_SCENARIO_TRACKS = {
   terraform: { label: 'Terraform', chip: 'terraform' },
 };
 
+export function isProductionScenarioQuestion(q) {
+  return (q.tags || []).includes('production-scenario');
+}
+
 export function getScenarioCountForTrack(trackId) {
   return ALL_QUESTIONS.filter(
-    q => q.category === trackId && (q.tags || []).includes('production-scenario')
+    q => q.category === trackId && isProductionScenarioQuestion(q)
   ).length;
 }
 
 export function getTotalScenarioCount() {
-  return ALL_QUESTIONS.length;
+  return ALL_QUESTIONS.filter(isProductionScenarioQuestion).length;
 }
 
 export function getTechnologyCountWithScenarios() {
@@ -36,7 +41,7 @@ export function getTechnologyCountWithScenarios() {
 
 export function getProductionScenariosUrl(chip) {
   if (chip) {
-    return `/interview-questions?chip=${encodeURIComponent(chip)}#practice`;
+    return `/interview-questions?filter=production-scenarios&chip=${encodeURIComponent(chip)}#practice`;
   }
   return PRODUCTION_SCENARIOS_URL;
 }

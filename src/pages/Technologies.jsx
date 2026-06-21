@@ -2,101 +2,11 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaDatabase, FaLinux, FaAws, FaArrowRight } from 'react-icons/fa';
-import { FiDatabase, FiTerminal, FiGitBranch, FiChevronRight } from 'react-icons/fi';
-import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform } from 'react-icons/si';
+import { FiTerminal, FiGitBranch, FiChevronRight } from 'react-icons/fi';
+import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform, SiPostgresql, SiMysql } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
 const TECH_CARDS = [
-  {
-    id: 'oracle-dba',
-    name: 'Oracle DBA',
-    path: '/oracle-dba',
-    icon: <FaDatabase />,
-    accent: '#ff5722',
-    glow: 'rgba(255, 87, 34, 0.4)',
-    iconBg: 'rgba(255, 87, 34, 0.1)',
-    desc: 'Core DBA concepts, memory architectures (SGA/PGA), performance tuning, and high-availability configurations.'
-  },
-  {
-    id: 'linux-admin',
-    name: 'Linux Admin',
-    path: '/linux-admin',
-    icon: <FaLinux />,
-    accent: '#10b981',
-    glow: 'rgba(16, 185, 129, 0.4)',
-    iconBg: 'rgba(16, 185, 129, 0.1)',
-    desc: 'Kernel parameters, process scheduling, file systems, LVM disk management, and shell administration.'
-  },
-  {
-    id: 'sql',
-    name: 'SQL',
-    path: '/sql-admin',
-    icon: <FiDatabase />,
-    accent: '#06b6d4',
-    glow: 'rgba(6, 182, 212, 0.4)',
-    iconBg: 'rgba(6, 182, 212, 0.1)',
-    desc: 'Advanced relational operations, execution plans, index optimization, normalisation, and analytic queries.'
-  },
-  {
-    id: 'aws-cloud',
-    name: 'AWS Cloud',
-    path: '/aws-cloud',
-    icon: <FaAws />,
-    accent: '#ff9900',
-    glow: 'rgba(255, 153, 0, 0.4)',
-    iconBg: 'rgba(255, 153, 0, 0.1)',
-    desc: 'RDS architectures, EC2 scaling, VPC networking, IAM security, S3 storage solutions, and cloud migrations.'
-  },
-  {
-    id: 'shell-scripting',
-    name: 'Shell Scripting',
-    path: '/shell-scripting',
-    icon: <FiTerminal />,
-    accent: '#3b82f6',
-    glow: 'rgba(59, 130, 246, 0.4)',
-    iconBg: 'rgba(59, 130, 246, 0.1)',
-    desc: 'Bash scripts, automation logic, backup routines, text processing (sed, awk), and log monitoring.'
-  },
-  {
-    id: 'devops',
-    name: 'DevOps',
-    path: '/devops',
-    icon: <FiGitBranch />,
-    accent: '#a855f7',
-    glow: 'rgba(168, 85, 247, 0.4)',
-    iconBg: 'rgba(168, 85, 247, 0.1)',
-    desc: 'CI/CD pipelines, Infrastructure as Code, Docker containerization, and Kubernetes orchestration.'
-  },
-  {
-    id: 'azure',
-    name: 'Azure Cloud',
-    path: '/azure-cloud',
-    icon: <VscAzure />,
-    accent: '#10b981',
-    glow: 'rgba(16, 185, 129, 0.4)',
-    iconBg: 'rgba(16, 185, 129, 0.1)',
-    desc: 'Azure Virtual Machines, App Services, AKS, Azure SQL, and robust Entra ID security integrations.'
-  },
-  {
-    id: 'google',
-    name: 'Google Cloud',
-    path: '/google-cloud',
-    icon: <SiGooglecloud />,
-    accent: '#4285F4',
-    glow: 'rgba(66, 133, 244, 0.4)',
-    iconBg: 'rgba(66, 133, 244, 0.1)',
-    desc: 'GKE orchestration, Compute Engine, Cloud Spanner, and Google Cloud Load Balancing capabilities.'
-  },
-  {
-    id: 'databricks',
-    name: 'Databricks',
-    path: '/databricks',
-    icon: <SiDatabricks />,
-    accent: '#FF3621',
-    glow: 'rgba(255, 54, 33, 0.4)',
-    iconBg: 'rgba(255, 54, 33, 0.1)',
-    desc: 'Lakehouse architecture, Apache Spark, Delta Lake, Unity Catalog, structured streaming, and workflow orchestration.'
-  },
   {
     id: 'snowflake',
     name: 'Snowflake',
@@ -106,6 +16,16 @@ const TECH_CARDS = [
     glow: 'rgba(41, 181, 232, 0.4)',
     iconBg: 'rgba(41, 181, 232, 0.1)',
     desc: 'Virtual warehouses, micro-partitions, Snowpipe ingestion, streams and tasks, RBAC, and data sharing.'
+  },
+  {
+    id: 'terraform',
+    name: 'Terraform',
+    path: '/terraform',
+    icon: <SiTerraform />,
+    accent: '#7B4EBC',
+    glow: 'rgba(123, 78, 188, 0.4)',
+    iconBg: 'rgba(123, 78, 188, 0.1)',
+    desc: 'Infrastructure as Code, providers, modules, remote state, workspaces, and multi-environment deployments.'
   },
   {
     id: 'kubernetes',
@@ -118,14 +38,104 @@ const TECH_CARDS = [
     desc: 'Container orchestration, deployments, services, ingress, storage, RBAC, Helm, and cluster troubleshooting.'
   },
   {
-    id: 'terraform',
-    name: 'Terraform',
-    path: '/terraform',
-    icon: <SiTerraform />,
-    accent: '#7B4EBC',
-    glow: 'rgba(123, 78, 188, 0.4)',
-    iconBg: 'rgba(123, 78, 188, 0.1)',
-    desc: 'Infrastructure as Code, providers, modules, remote state, workspaces, and multi-environment deployments.'
+    id: 'aws-cloud',
+    name: 'AWS Cloud',
+    path: '/aws-cloud',
+    icon: <FaAws />,
+    accent: '#ff9900',
+    glow: 'rgba(255, 153, 0, 0.4)',
+    iconBg: 'rgba(255, 153, 0, 0.1)',
+    desc: 'RDS architectures, EC2 scaling, VPC networking, IAM security, S3 storage solutions, and cloud migrations.'
+  },
+  {
+    id: 'google',
+    name: 'Google Cloud',
+    path: '/google-cloud',
+    icon: <SiGooglecloud />,
+    accent: '#4285F4',
+    glow: 'rgba(66, 133, 244, 0.4)',
+    iconBg: 'rgba(66, 133, 244, 0.1)',
+    desc: 'GKE orchestration, Compute Engine, Cloud Spanner, and Google Cloud Load Balancing capabilities.'
+  },
+  {
+    id: 'azure',
+    name: 'Azure Cloud',
+    path: '/azure-cloud',
+    icon: <VscAzure />,
+    accent: '#10b981',
+    glow: 'rgba(16, 185, 129, 0.4)',
+    iconBg: 'rgba(16, 185, 129, 0.1)',
+    desc: 'Azure Virtual Machines, App Services, AKS, Azure SQL, and robust Entra ID security integrations.'
+  },
+  {
+    id: 'oracle-dba',
+    name: 'Oracle DBA',
+    path: '/oracle-dba',
+    icon: <FaDatabase />,
+    accent: '#ff5722',
+    glow: 'rgba(255, 87, 34, 0.4)',
+    iconBg: 'rgba(255, 87, 34, 0.1)',
+    desc: 'Core DBA concepts, memory architectures (SGA/PGA), performance tuning, and high-availability configurations.'
+  },
+  {
+    id: 'postgresql',
+    name: 'PostgreSQL',
+    path: '/postgresql',
+    icon: <SiPostgresql />,
+    accent: '#336791',
+    glow: 'rgba(51, 103, 145, 0.4)',
+    iconBg: 'rgba(51, 103, 145, 0.1)',
+    desc: 'MVCC, WAL, vacuum, streaming and logical replication, indexing, partitioning, backup/PITR, and Patroni HA.'
+  },
+  {
+    id: 'mysql',
+    name: 'MySQL',
+    path: '/mysql',
+    icon: <SiMysql />,
+    accent: '#00758F',
+    glow: 'rgba(0, 117, 143, 0.4)',
+    iconBg: 'rgba(0, 117, 143, 0.1)',
+    desc: 'InnoDB architecture, binary logs, GTID replication, query optimization, XtraBackup, and Group Replication HA.'
+  },
+  {
+    id: 'linux-admin',
+    name: 'Linux Admin',
+    path: '/linux-admin',
+    icon: <FaLinux />,
+    accent: '#10b981',
+    glow: 'rgba(16, 185, 129, 0.4)',
+    iconBg: 'rgba(16, 185, 129, 0.1)',
+    desc: 'Kernel parameters, process scheduling, file systems, LVM disk management, and shell administration.'
+  },
+  {
+    id: 'devops',
+    name: 'DevOps',
+    path: '/devops',
+    icon: <FiGitBranch />,
+    accent: '#a855f7',
+    glow: 'rgba(168, 85, 247, 0.4)',
+    iconBg: 'rgba(168, 85, 247, 0.1)',
+    desc: 'CI/CD pipelines, Infrastructure as Code, Docker containerization, and Kubernetes orchestration.'
+  },
+  {
+    id: 'shell-scripting',
+    name: 'Shell Scripting',
+    path: '/shell-scripting',
+    icon: <FiTerminal />,
+    accent: '#3b82f6',
+    glow: 'rgba(59, 130, 246, 0.4)',
+    iconBg: 'rgba(59, 130, 246, 0.1)',
+    desc: 'Bash scripts, automation logic, backup routines, text processing (sed, awk), and log monitoring.'
+  },
+  {
+    id: 'databricks',
+    name: 'Databricks',
+    path: '/databricks',
+    icon: <SiDatabricks />,
+    accent: '#FF3621',
+    glow: 'rgba(255, 54, 33, 0.4)',
+    iconBg: 'rgba(255, 54, 33, 0.1)',
+    desc: 'Lakehouse architecture, Apache Spark, Delta Lake, Unity Catalog, structured streaming, and workflow orchestration.'
   }
 ];
 

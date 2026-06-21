@@ -5,14 +5,15 @@ import { ALL_QUESTIONS } from '../data/questionLoader';
 import { saveRoadmapProgress } from '../lib/readinessStorage';
 import { getGlobalCompletedIds, subscribeToProgress } from '../lib/trackProgress';
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
-import { FiDatabase, FiTerminal, FiGitBranch, FiAward, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform } from 'react-icons/si';
+import { FiTerminal, FiGitBranch, FiAward, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform, SiPostgresql, SiMysql } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
 const TRACKS = [
   { id: 'oracle dba', name: 'Oracle DBA', icon: <FaDatabase /> },
+  { id: 'postgresql', name: 'PostgreSQL', icon: <SiPostgresql /> },
+  { id: 'mysql', name: 'MySQL', icon: <SiMysql /> },
   { id: 'linux', name: 'Linux Admin', icon: <FaLinux /> },
-  { id: 'sql', name: 'SQL', icon: <FiDatabase /> },
   { id: 'aws', name: 'AWS Cloud', icon: <FaAws /> },
   { id: 'azure', name: 'Azure Cloud', icon: <VscAzure /> },
   { id: 'google', name: 'Google Cloud', icon: <SiGooglecloud /> },

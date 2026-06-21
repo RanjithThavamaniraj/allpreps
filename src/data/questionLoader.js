@@ -15,16 +15,42 @@ for (const path in modules) {
 
 // Map the legacy monolithic data to match the new schema so the UI doesn't break
 // during the data migration phase.
-const mappedLegacy = legacyData.map(q => ({
-  id: `legacy-${q.id}`,
-  technology: q.category.replace(' dba', '').replace(' cloud', '').trim(), // Normalize e.g., 'oracle dba' -> 'oracle'
-  category: q.category, // Keep original category for backwards compatibility
-  difficulty: q.difficulty,
-  question: q.title,
-  answer: q.answer,
-  command: q.command,
-  tags: [q.category]
-}));
+function mapLegacyCategory(item) {
+  const category = item.category;
+  if (category !== 'sql') {
+    return {
+      category,
+      technology: category.replace(' dba', '').replace(' cloud', '').trim(),
+    };
+  }
+
+  const text = `${item.title || ''} ${item.answer || ''}`.toLowerCase();
+  let target = 'postgresql';
+  if (text.includes('mysql') || text.includes('innodb') || text.includes('myisam') || text.includes('binlog') || text.includes('gtid')) {
+    target = 'mysql';
+  } else if (text.includes('postgres') || text.includes('postgresql') || text.includes('vacuum') || text.includes('mvcc') || text.includes(' wal')) {
+    target = 'postgresql';
+  } else if (item.id % 2 === 0) {
+    target = 'mysql';
+  }
+
+  return { category: target, technology: target };
+}
+
+const mappedLegacy = legacyData
+  .map(q => {
+    const { category, technology } = mapLegacyCategory(q);
+    return {
+      id: `legacy-${q.id}`,
+      technology,
+      category,
+      difficulty: q.difficulty,
+      question: q.title,
+      answer: q.answer,
+      command: q.command,
+      tags: [category, ...(category === 'postgresql' || category === 'mysql' ? ['sql-fundamentals'] : [])],
+    };
+  });
 
 // Combine new architecture questions with the legacy fallback
 export const ALL_QUESTIONS = [...newQuestions, ...mappedLegacy];
@@ -62,6 +88,10 @@ export const searchQuestions = (query, filters = {}) => {
       'ingress': ['kubernetes', 'service', 'tls', 'load balancer'],
       'terraform state': ['terraform', 'drift', 'backend', 'remote state', 'lock'],
       'iac': ['terraform', 'module', 'provider', 'provisioner'],
+      'mvcc': ['postgresql', 'vacuum', 'wal', 'transaction', 'bloat'],
+      'postgres': ['postgresql', 'pg_stat', 'replication', 'vacuum'],
+      'mysql': ['innodb', 'binlog', 'replication', 'gtid', 'buffer pool'],
+      'replication lag': ['postgresql', 'mysql', 'standby', 'replica', 'binlog'],
     };
 
     // Expand search query with semantic keywords if a map matches

@@ -41,10 +41,6 @@ export default function Footer() {
       <div className="footer-bar">
         <div className="container footer-bar-inner">
           <p>© 2026 AllPreps. Built for builders and learners.</p>
-          <div className="footer-bar-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-          </div>
         </div>
       </div>
     </footer>

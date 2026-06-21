@@ -158,7 +158,7 @@ export default function Auth() {
                     <input type="checkbox" />
                     <span>Remember me</span>
                   </label>
-                  <a href="#" className="auth-forgot">Forgot password?</a>
+                  <span className="auth-forgot" style={{ opacity: 0.5, cursor: 'default' }}>Password reset coming soon</span>
                 </div>
               )}
 

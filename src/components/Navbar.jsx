@@ -75,7 +75,7 @@ export default function Navbar() {
           <a href="/interview-questions" className="nav-link">Interview Guides</a>
           <a href="/mock-interviews"     className="nav-link">Mock Interviews</a>
           <a href="/readiness"           className="nav-link">Readiness</a>
-          <a href="/interview-questions#practice" className="nav-link">Production Scenarios</a>
+          <a href="/interview-questions?filter=production-scenarios#practice" className="nav-link">Production Scenarios</a>
           <a href="/pricing"             className="nav-link">Pricing</a>
           <a href="/roadmaps"            className="nav-link">Resources</a>
         </div>
@@ -114,7 +114,7 @@ export default function Navbar() {
           <a href="/interview-questions" className="mobile-link" onClick={() => setOpen(false)}>Interview Guides</a>
           <a href="/mock-interviews"     className="mobile-link" onClick={() => setOpen(false)}>Mock Interviews</a>
           <a href="/readiness"           className="mobile-link" onClick={() => setOpen(false)}>Readiness</a>
-          <a href="/interview-questions#practice" className="mobile-link" onClick={() => setOpen(false)}>Production Scenarios</a>
+          <a href="/interview-questions?filter=production-scenarios#practice" className="mobile-link" onClick={() => setOpen(false)}>Production Scenarios</a>
           <a href="/pricing"             className="mobile-link" onClick={() => setOpen(false)}>Pricing</a>
           <a href="/roadmaps"            className="mobile-link" onClick={() => setOpen(false)}>Resources</a>
 
