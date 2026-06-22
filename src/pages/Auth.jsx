@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FiMail, FiLock, FiUser, FiArrowLeft, FiCheckCircle } from 'react-icons/fi';
+import { navigateTo } from '../lib/navigation';
 
 export default function Auth() {
   const [mode, setMode] = useState('login'); // 'login', 'register', 'verify'
@@ -29,19 +30,8 @@ export default function Auth() {
         loggedIn: true
       };
       localStorage.setItem('allpreps_user', JSON.stringify(userData));
-      
-      try {
-        if (window.opener) {
-          window.opener.postMessage({ type: 'ALLPREPS_AUTH_SUCCESS' }, '*');
-        }
-      } catch (err) {
-        console.error("Error messaging opener:", err);
-      }
-
-      alert('Successfully signed in! (Redirecting...)');
-      window.close(); // Close the window if it was opened in a new tab
-      // fallback if window.close() is blocked
-      window.location.href = '/'; 
+      window.dispatchEvent(new Event('allpreps-auth-updated'));
+      navigateTo('/');
     }, 1500);
   };
 

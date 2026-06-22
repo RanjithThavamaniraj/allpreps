@@ -19,6 +19,17 @@ export function getRouteKey() {
   return window.location.pathname + window.location.search;
 }
 
+/** Programmatic SPA navigation (used after auth, etc.) */
+export function navigateTo(path) {
+  const url = new URL(path, window.location.origin);
+  const nextUrl = url.pathname + url.search + url.hash;
+  const currentUrl = window.location.pathname + window.location.search + window.location.hash;
+  if (nextUrl === currentUrl) return;
+
+  window.history.pushState({}, '', nextUrl);
+  window.dispatchEvent(new Event('allpreps-route-change'));
+}
+
 export function scrollToHash(hash, retries = 12) {
   if (!hash) return;
   const id = hash.startsWith('#') ? hash.slice(1) : hash;

@@ -44,6 +44,7 @@ export default function Navbar() {
     };
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('message', handleMessage);
+    window.addEventListener('allpreps-auth-updated', checkUser);
     window.addEventListener('allpreps-subscription-updated', checkUser);
 
     const interval = setInterval(checkUser, 1000);
@@ -51,6 +52,7 @@ export default function Navbar() {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('message', handleMessage);
+      window.removeEventListener('allpreps-auth-updated', checkUser);
       window.removeEventListener('allpreps-subscription-updated', checkUser);
       clearInterval(interval);
     };
@@ -94,7 +96,7 @@ export default function Navbar() {
           ) : (
             <>
               {pro && <span className="nav-pro-badge">PRO</span>}
-              <a href="/auth" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">Sign In</a>
+              <a href="/auth" className="btn btn-ghost btn-sm">Sign In</a>
             </>
           )}
         </div>
@@ -130,7 +132,7 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <a href="/auth" target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm w-full" onClick={() => setOpen(false)}>Sign In</a>
+              <a href="/auth" className="btn btn-secondary btn-sm w-full" onClick={() => setOpen(false)}>Sign In</a>
             )}
           </div>
         </div>

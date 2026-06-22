@@ -40,7 +40,11 @@ function App() {
 
   useEffect(() => {
     window.addEventListener('popstate', syncLocation);
-    return () => window.removeEventListener('popstate', syncLocation);
+    window.addEventListener('allpreps-route-change', syncLocation);
+    return () => {
+      window.removeEventListener('popstate', syncLocation);
+      window.removeEventListener('allpreps-route-change', syncLocation);
+    };
   }, [syncLocation]);
 
   useEffect(() => {
