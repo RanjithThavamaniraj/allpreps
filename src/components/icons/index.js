@@ -1,0 +1,35 @@
+export { AppIcon } from './AppIcon';
+export { ICON_SIZES } from './sizes';
+export { FREQUENCY_ICON_MAP } from './frequencyIcons';
+
+export {
+  AlertTriangle,
+  ArrowRight,
+  Award,
+  BarChart3,
+  BookOpen,
+  Brain,
+  Briefcase,
+  Check,
+  CheckCircle,
+  ClipboardList,
+  Cloud,
+  Crown,
+  FileText,
+  Flame,
+  Layers,
+  Map,
+  MessageSquare,
+  PartyPopper,
+  Play,
+  RefreshCw,
+  Search,
+  Star,
+  Target,
+  ThumbsUp,
+  Timer,
+  TrendingUp,
+  Trophy,
+  X,
+  Zap,
+} from 'lucide-react';

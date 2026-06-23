@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react';
-import { FiCpu, FiMessageSquare, FiBookOpen, FiActivity, FiLayers, FiCheckCircle, FiPlay, FiRefreshCw } from 'react-icons/fi';
+import {
+  AppIcon,
+  Brain,
+  BookOpen,
+  Zap,
+  MessageSquare,
+  Layers,
+  CheckCircle,
+  Play,
+  RefreshCw,
+} from './icons';
 
 export default function AIGuidancePanel({ question, tags }) {
   const [activeFeature, setActiveFeature] = useState('explain'); // 'explain', 'scenario', 'mock', 'deepdive'
@@ -94,15 +104,15 @@ export default function AIGuidancePanel({ question, tags }) {
   return (
     <div className="ai-guidance-panel">
       <div className="ai-header">
-        <FiCpu className="ai-icon-pulse" />
+        <AppIcon icon={Brain} size="lg" className="ai-icon-pulse" />
         <span className="ai-title">AI Interview Guide</span>
       </div>
 
       <div className="ai-feature-tabs">
-        <button className={activeFeature === 'explain' ? 'active' : ''} onClick={() => setActiveFeature('explain')}><FiBookOpen/> Explain</button>
-        <button className={activeFeature === 'scenario' ? 'active' : ''} onClick={() => setActiveFeature('scenario')}><FiActivity/> Scenario</button>
-        <button className={activeFeature === 'mock' ? 'active' : ''} onClick={() => setActiveFeature('mock')}><FiMessageSquare/> Mock</button>
-        <button className={activeFeature === 'deepdive' ? 'active' : ''} onClick={() => setActiveFeature('deepdive')}><FiLayers/> Deep Dive</button>
+        <button className={activeFeature === 'explain' ? 'active' : ''} onClick={() => setActiveFeature('explain')}><AppIcon icon={BookOpen} size="sm" /> Explain</button>
+        <button className={activeFeature === 'scenario' ? 'active' : ''} onClick={() => setActiveFeature('scenario')}><AppIcon icon={Zap} size="sm" /> Scenario</button>
+        <button className={activeFeature === 'mock' ? 'active' : ''} onClick={() => setActiveFeature('mock')}><AppIcon icon={MessageSquare} size="sm" /> Mock</button>
+        <button className={activeFeature === 'deepdive' ? 'active' : ''} onClick={() => setActiveFeature('deepdive')}><AppIcon icon={Layers} size="sm" /> Deep Dive</button>
       </div>
 
       <div className="ai-content-area">
@@ -121,7 +131,7 @@ export default function AIGuidancePanel({ question, tags }) {
             
             {!isGenerating && (
               <div className="ai-followups">
-                <h4><FiRefreshCw style={{marginRight: '6px'}}/> Interviewer Follow-ups</h4>
+                <h4><AppIcon icon={RefreshCw} size="sm" style={{ marginRight: '6px' }} /> Interviewer Follow-ups</h4>
                 <ul>
                   <li>"What happens if this component completely fails?"</li>
                   <li>"How would you monitor this using standard views?"</li>
@@ -171,21 +181,21 @@ export default function AIGuidancePanel({ question, tags }) {
               rows={4}
             />
             <button className="btn btn-primary btn-sm" style={{width: '100%', marginTop: '12px'}} onClick={handleEvaluateMock} disabled={isGenerating || !userMockAnswer.trim()}>
-              {isGenerating ? 'Evaluating Response...' : <><FiPlay /> Evaluate My Answer</>}
+              {isGenerating ? 'Evaluating Response...' : <><AppIcon icon={Play} size="sm" /> Evaluate My Answer</>}
             </button>
 
             {mockFeedback && !isGenerating && (
               <div className="ai-evaluation fade-up">
                 <div className="eval-group strong">
-                  <h5><FiCheckCircle/> Strong Points</h5>
+                  <h5><AppIcon icon={CheckCircle} size="sm" /> Strong Points</h5>
                   <ul>{mockFeedback.strong.map((s,i)=><li key={i}>{s}</li>)}</ul>
                 </div>
                 <div className="eval-group missing">
-                  <h5><FiActivity/> Missing Points</h5>
+                  <h5><AppIcon icon={Zap} size="sm" /> Missing Points</h5>
                   <ul>{mockFeedback.missing.map((s,i)=><li key={i}>{s}</li>)}</ul>
                 </div>
                 <div className="eval-group suggestions">
-                  <h5><FiMessageSquare/> Suggestions</h5>
+                  <h5><AppIcon icon={MessageSquare} size="sm" /> Suggestions</h5>
                   <ul>{mockFeedback.suggestions.map((s,i)=><li key={i}>{s}</li>)}</ul>
                 </div>
               </div>

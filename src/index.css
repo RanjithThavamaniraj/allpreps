@@ -487,8 +487,15 @@ a { text-decoration: none; }
 }
 
 .hero-feature-pill-icon {
-  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
+  color: var(--primary-hover);
+}
+
+.app-icon {
+  flex-shrink: 0;
+  color: currentColor;
 }
 
 .hero-tech-stack {
@@ -3865,8 +3872,10 @@ a { text-decoration: none; }
 }
 
 .pro-interest-success-icon {
-  font-size: 3rem;
+  display: flex;
+  justify-content: center;
   margin-bottom: 16px;
+  color: var(--success);
 }
 
 .pro-interest-success h2 {
@@ -4437,7 +4446,7 @@ a { text-decoration: none; }
   padding: 2px 6px;
 }
 
-.freq-badge-compact span:not(.freq-badge-emoji) {
+.freq-badge-compact span:not(.freq-badge-icon) {
   display: none;
 }
 

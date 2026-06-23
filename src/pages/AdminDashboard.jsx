@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FiActivity, FiRefreshCw } from 'react-icons/fi';
+import { AppIcon, BarChart3, RefreshCw } from '../components/icons';
 import { LogoIcon } from '../components/Logo';
 import FounderMetricCard from '../components/founder/FounderMetricCard';
 import FounderActivityChart from '../components/founder/FounderActivityChart';
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
         <div className="founder-topbar-actions">
           <span className="founder-updated">Updated {updatedLabel}</span>
           <button type="button" className="btn btn-secondary btn-sm" onClick={refresh}>
-            <FiRefreshCw size={14} /> Refresh
+            <AppIcon icon={RefreshCw} size="sm" /> Refresh
           </button>
         </div>
       </header>
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       <main className="founder-main">
         <section className="founder-hero">
           <div>
-            <p className="founder-eyebrow"><FiActivity size={14} /> Product metrics</p>
+            <p className="founder-eyebrow"><AppIcon icon={BarChart3} size="sm" /> Product metrics</p>
             <h1>Founder Dashboard</h1>
             <p className="founder-subtitle">
               Track acquisition, learning engagement, and monetization signals.

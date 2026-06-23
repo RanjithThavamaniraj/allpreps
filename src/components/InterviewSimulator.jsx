@@ -1,6 +1,69 @@
 import { useState, useEffect } from 'react';
 import { MOCK_INTERVIEW_QUESTIONS } from '../data/new_questions/mock_interview';
 import { FiChevronLeft, FiChevronRight, FiRefreshCw } from 'react-icons/fi';
+import {
+  AppIcon,
+  AlertTriangle,
+  BookOpen,
+  Check,
+  ClipboardList,
+  ThumbsUp,
+  Timer,
+  Trophy,
+  X,
+} from './icons';
+
+function FeatureRow({ icon, title, children, highlight = false }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: '16px',
+        alignItems: 'flex-start',
+        ...(highlight
+          ? {
+              border: '1px dashed rgba(245, 158, 11, 0.25)',
+              padding: '16px',
+              borderRadius: '12px',
+              backgroundColor: 'rgba(245, 158, 11, 0.04)',
+            }
+          : {}),
+      }}
+    >
+      <span style={{ marginTop: '2px', color: highlight ? 'var(--accent)' : 'var(--primary-hover)' }}>
+        <AppIcon icon={icon} size="2xl" />
+      </span>
+      <div>
+        <h4 style={{ fontSize: '15px', fontWeight: '700', color: highlight ? 'var(--accent)' : 'var(--text-primary)', marginBottom: '4px' }}>
+          {title}
+        </h4>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function FeedbackLabel({ percentage }) {
+  if (percentage >= 90) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+        <AppIcon icon={Trophy} size="sm" /> Expert Level!
+      </span>
+    );
+  }
+  if (percentage >= 70) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+        <AppIcon icon={ThumbsUp} size="sm" /> Well Prepared!
+      </span>
+    );
+  }
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+      <AppIcon icon={BookOpen} size="sm" /> Needs Practice!
+    </span>
+  );
+}
 
 export default function InterviewSimulator() {
   const [questions, setQuestions] = useState(() => {
@@ -123,29 +186,17 @@ export default function InterviewSimulator() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px', textAlign: 'left' }}>
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '24px', marginTop: '2px' }}>📋</span>
-              <div>
-                <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>100 Questions</h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>A randomized set of multiple-choice questions covering full-stack concepts.</p>
-              </div>
-            </div>
+            <FeatureRow icon={ClipboardList} title="100 Questions">
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>A randomized set of multiple-choice questions covering full-stack concepts.</p>
+            </FeatureRow>
 
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '24px', marginTop: '2px' }}>⏱️</span>
-              <div>
-                <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>1 Hour 15 Minutes</h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>A steady countdown timer to simulate real interview pressure.</p>
-              </div>
-            </div>
+            <FeatureRow icon={Timer} title="1 Hour 15 Minutes">
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>A steady countdown timer to simulate real interview pressure.</p>
+            </FeatureRow>
 
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', border: '1px dashed rgba(245, 158, 11, 0.25)', padding: '16px', borderRadius: '12px', backgroundColor: 'rgba(245, 158, 11, 0.04)' }}>
-              <span style={{ fontSize: '24px', marginTop: '2px' }}>⚠️</span>
-              <div>
-                <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--accent)', marginBottom: '4px' }}>Limited Pauses</h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>You can pause the timer <strong>only twice</strong> during the entire test.</p>
-              </div>
-            </div>
+            <FeatureRow icon={AlertTriangle} title="Limited Pauses" highlight>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>You can pause the timer <strong>only twice</strong> during the entire test.</p>
+            </FeatureRow>
           </div>
 
           <button 
@@ -233,7 +284,7 @@ export default function InterviewSimulator() {
                 Feedback
               </div>
               <div style={{ fontSize: '16px', fontWeight: '700', color: percentage >= 70 ? '#10b981' : '#f59e0b' }}>
-                {percentage >= 90 ? 'Expert Level! 🏆' : percentage >= 70 ? 'Well Prepared! 👍' : 'Needs Practice! 📚'}
+                <FeedbackLabel percentage={percentage} />
               </div>
             </div>
           </div>
@@ -281,9 +332,13 @@ export default function InterviewSimulator() {
                 fontSize: '18px', 
                 fontWeight: '700', 
                 color: timeLeft < 300 ? '#ef4444' : 'var(--text-primary)',
-                animation: timeLeft < 300 ? 'pulseRed 1s infinite alternate' : 'none'
+                animation: timeLeft < 300 ? 'pulseRed 1s infinite alternate' : 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
               }}>
-                ⏱️ {formatTime(timeLeft)}
+                <AppIcon icon={Timer} size="sm" />
+                {formatTime(timeLeft)}
               </span>
               <button 
                 onClick={handleToggleTimer} 
@@ -307,8 +362,9 @@ export default function InterviewSimulator() {
                 {isTimerActive ? 'Pause' : 'Resume'}
               </button>
             </div>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600', textAlign: 'center' }}>
-              ⚠️ Max 2 pauses allowed ({pauseCount}/2 used)
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600', textAlign: 'center', display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+              <AppIcon icon={AlertTriangle} size="xs" />
+              Max 2 pauses allowed ({pauseCount}/2 used)
             </span>
           </div>
 
@@ -396,10 +452,10 @@ export default function InterviewSimulator() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
                     <span style={{ flexGrow: 1 }}>{option}</span>
                     {selectedOption !== null && idx === currentQ.correctOptionIndex && (
-                      <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '18px' }}>✓</span>
+                      <AppIcon icon={Check} size="lg" style={{ color: '#10b981' }} />
                     )}
                     {selectedOption !== null && idx === selectedOption && idx !== currentQ.correctOptionIndex && (
-                      <span style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '18px' }}>✗</span>
+                      <AppIcon icon={X} size="lg" style={{ color: '#ef4444' }} />
                     )}
                   </div>
                 </button>

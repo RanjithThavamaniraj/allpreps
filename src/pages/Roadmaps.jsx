@@ -6,6 +6,7 @@ import { saveRoadmapProgress } from '../lib/readinessStorage';
 import { getGlobalCompletedIds, subscribeToProgress } from '../lib/trackProgress';
 import { FaDatabase, FaLinux, FaAws } from 'react-icons/fa';
 import { FiTerminal, FiGitBranch, FiAward, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { AppIcon, PartyPopper } from '../components/icons';
 import { SiGooglecloud, SiDatabricks, SiSnowflake, SiKubernetes, SiTerraform, SiPostgresql, SiMysql } from 'react-icons/si';
 import { VscAzure } from 'react-icons/vsc';
 
@@ -347,8 +348,9 @@ export default function Roadmaps() {
                 </div>
 
                 {progressMetrics.pct === 100 && (
-                  <div style={{ marginTop: '24px', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', textAlign: 'center', color: '#22c55e', fontSize: '13px', fontWeight: '600' }}>
-                    🎉 Track fully completed! Excellent job!
+                  <div style={{ marginTop: '24px', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', textAlign: 'center', color: '#22c55e', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <AppIcon icon={PartyPopper} size="sm" />
+                    Track fully completed! Excellent job!
                   </div>
                 )}
 

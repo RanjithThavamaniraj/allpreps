@@ -1,4 +1,4 @@
-import { FiPlay, FiBarChart2 } from 'react-icons/fi';
+import { AppIcon, Play, BarChart3 } from './icons';
 
 const LEVELS = [
   { id: 'easy', label: 'Beginner', count: 10, desc: 'Fundamentals & core concepts' },
@@ -26,12 +26,12 @@ export default function PracticeTestSection({ trackName, trackId, onStartPractic
               className="practice-test-card"
               onClick={() => onStartPractice?.(level.id)}
             >
-              <FiBarChart2 className="practice-test-icon" />
+              <AppIcon icon={BarChart3} size="xl" className="practice-test-icon" />
               <h3>{level.label}</h3>
               <p>{level.desc}</p>
               <span className="practice-test-meta">{level.count} questions</span>
               <span className="practice-test-start">
-                <FiPlay /> Start Practice
+                <AppIcon icon={Play} size="sm" /> Start Practice
               </span>
             </button>
           ))}

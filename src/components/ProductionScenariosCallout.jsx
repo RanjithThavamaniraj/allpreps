@@ -1,4 +1,4 @@
-import { FiActivity, FiArrowRight } from 'react-icons/fi';
+import { AppIcon, Zap, ArrowRight } from './icons';
 import {
   getScenarioCountForTrack,
   getProductionScenariosUrl,
@@ -19,7 +19,7 @@ export default function ProductionScenariosCallout({ trackId }) {
         <div className="ps-callout">
           <div className="ps-callout-content">
             <h3 className="ps-callout-title">
-              <FiActivity /> Production Scenarios — {track.label}
+              <AppIcon icon={Zap} size="md" /> Production Scenarios — {track.label}
             </h3>
             <p className="ps-callout-desc">
               Test your skills with real {track.label} production incidents and infrastructure challenges.
@@ -28,7 +28,7 @@ export default function ProductionScenariosCallout({ trackId }) {
           <div className="ps-callout-actions">
             <span className="ps-callout-count">{count} Scenarios available</span>
             <a href={href} className="btn btn-primary">
-              Try Production Scenarios <FiArrowRight />
+              Try Production Scenarios <ArrowRight size={14} />
             </a>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
+import { AppIcon, PartyPopper } from './icons';
 import { PRO_INTEREST_TRACKS, PAYMENT_INTEREST_OPTIONS } from '../lib/proInterestTracks';
 import { submitProInterest } from '../lib/proInterest';
 
@@ -82,7 +83,9 @@ export default function ProInterestModal({ open, onClose, defaultTrack = 'Oracle
 
         {success ? (
           <div className="pro-interest-success">
-            <div className="pro-interest-success-icon" aria-hidden="true">🎉</div>
+            <div className="pro-interest-success-icon" aria-hidden="true">
+              <AppIcon icon={PartyPopper} size="3xl" />
+            </div>
             <h2 id="pro-interest-title">Thank you!</h2>
             <p>
               You&apos;ve been added to the AllPreps Pro Early Access List.

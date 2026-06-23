@@ -44,19 +44,19 @@ export function isFundamentalQuestion(q) {
   return q?.difficulty === 'easy' || tags.some(t => t.includes('fundamental'));
 }
 
-/** @returns {{ emoji: string, label: string, className: string }[]} */
+/** @returns {{ icon: 'Flame'|'Star'|'BookOpen', label: string, className: string }[]} */
 export function getFrequencyBadges(q) {
   const badges = [];
   const freq = (q?.frequency || '').toLowerCase().trim();
 
   if (freq === 'very common') {
-    badges.push({ emoji: '🔥', label: 'Frequently Asked', className: 'freq-hot' });
+    badges.push({ icon: 'Flame', label: 'Frequently Asked', className: 'freq-hot' });
   } else if (freq === 'common') {
-    badges.push({ emoji: '⭐', label: 'Common', className: 'freq-star' });
+    badges.push({ icon: 'Star', label: 'Common', className: 'freq-star' });
   }
 
   if (isFundamentalQuestion(q)) {
-    badges.push({ emoji: '📚', label: 'Fundamental', className: 'freq-fundamental' });
+    badges.push({ icon: 'BookOpen', label: 'Fundamental', className: 'freq-fundamental' });
   }
 
   return badges;
