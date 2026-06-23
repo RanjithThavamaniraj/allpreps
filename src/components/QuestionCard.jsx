@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiChevronDown, FiChevronUp, FiCheck } from 'react-icons/fi';
 import AIGuidancePanel from './AIGuidancePanel';
 import StructuredAnswer from './StructuredAnswer';
@@ -9,6 +9,7 @@ import {
   formatCategoryLabel,
   getQuestionTitle,
 } from '../lib/questionMeta';
+import { trackFounderMetric, FOUNDER_METRICS } from '../lib/founderAnalytics';
 
 export default function QuestionCard({ q, idx, completed, onToggleCompleted }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -20,6 +21,13 @@ export default function QuestionCard({ q, idx, completed, onToggleCompleted }) {
   const categoryLabel = formatCategoryLabel(q.category || q.tags?.[0]);
   const preview = extractInterviewPreview(answerText);
   const difficultyLabel = DIFFICULTY_LABELS[q.difficulty] || q.difficulty;
+
+  useEffect(() => {
+    if (!isExpanded) return;
+    trackFounderMetric(FOUNDER_METRICS.QUESTIONS_VIEWED, {
+      metadata: { questionId: q.rawId || q.id, category: q.category || q.tags?.[0] },
+    });
+  }, [isExpanded, q.rawId, q.id, q.category, q.tags]);
 
   return (
     <div

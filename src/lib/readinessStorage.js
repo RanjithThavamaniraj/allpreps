@@ -12,6 +12,7 @@
 
 import { ALL_QUESTIONS } from '../data/questionLoader';
 import { calculateReadinessScore } from './calculateReadiness';
+import { trackFounderMetric, FOUNDER_METRICS } from './founderAnalytics';
 
 const STORAGE_KEY = 'allpreps_user_data';
 const LEGACY_COMPLETED_KEY = 'allpreps_completed_questions';
@@ -308,11 +309,19 @@ export function saveRoadmapProgress(technology, checkedQuestions, total) {
 export function toggleRoadmapQuestion(technology, questionId, totalQuestions) {
   const data = getUserData();
   const current = data.roadmapProgress[technology]?.checkedQuestions ?? [];
-  const updated = current.includes(questionId)
-    ? current.filter(id => id !== questionId)
-    : [...current, questionId];
+  const isCompleting = !current.includes(questionId);
+  const updated = isCompleting
+    ? [...current, questionId]
+    : current.filter(id => id !== questionId);
 
   saveRoadmapProgress(technology, updated, totalQuestions);
+
+  if (isCompleting) {
+    trackFounderMetric(FOUNDER_METRICS.QUESTIONS_COMPLETED, {
+      metadata: { technology, questionId },
+    });
+  }
+
   return updated;
 }
 

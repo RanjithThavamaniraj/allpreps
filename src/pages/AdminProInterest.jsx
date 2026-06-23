@@ -41,7 +41,8 @@ export default function AdminProInterest() {
             <h1>Pro Interest Submissions</h1>
             <p>Early access leads captured before payment integration.</p>
             <div className="admin-header-links">
-              <a href="/admin/analytics" className="btn btn-secondary btn-sm">← Analytics</a>
+              <a href="/admin" className="btn btn-primary btn-sm">Founder Dashboard →</a>
+              <a href="/admin/analytics" className="btn btn-secondary btn-sm">Monetization</a>
             </div>
           </header>
 

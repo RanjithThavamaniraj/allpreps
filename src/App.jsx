@@ -21,8 +21,10 @@ import Readiness from './pages/Readiness';
 import Pricing from './pages/Pricing';
 import AdminAnalytics from './pages/AdminAnalytics';
 import AdminProInterest from './pages/AdminProInterest';
+import AdminDashboard from './pages/AdminDashboard';
 import Auth from './pages/Auth';
 import { getRouteKey, scrollToHash } from './lib/navigation';
+import { recordVisitor } from './lib/founderAnalytics';
 
 function dispatchNavigate() {
   window.dispatchEvent(new Event('allpreps-navigate'));
@@ -36,6 +38,12 @@ function App() {
     setCurrentPath(window.location.pathname);
     setRouteKey(getRouteKey());
     dispatchNavigate();
+  }, []);
+
+  useEffect(() => {
+    if (!window.location.pathname.startsWith('/admin')) {
+      recordVisitor();
+    }
   }, []);
 
   useEffect(() => {
@@ -113,6 +121,8 @@ function App() {
       return <Readiness key={routeKey} />;
     case '/pricing':
       return <Pricing key={routeKey} />;
+    case '/admin':
+      return <AdminDashboard key={routeKey} />;
     case '/admin/analytics':
       return <AdminAnalytics key={routeKey} />;
     case '/admin/pro-interest':

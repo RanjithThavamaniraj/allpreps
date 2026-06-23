@@ -52,7 +52,8 @@ export default function AdminAnalytics() {
             <h1>Monetization Analytics</h1>
             <p>Validate upgrade demand before building payment infrastructure.</p>
             <div className="admin-header-links">
-              <a href="/admin/pro-interest" className="btn btn-primary btn-sm">View Pro Interest →</a>
+              <a href="/admin" className="btn btn-primary btn-sm">Founder Dashboard →</a>
+              <a href="/admin/pro-interest" className="btn btn-secondary btn-sm">Pro Interest</a>
             </div>
           </header>
 

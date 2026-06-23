@@ -14,6 +14,7 @@ import {
 } from '../lib/questionMeta';
 import { getGlobalCompletedIds, subscribeToProgress, toggleTrackQuestion } from '../lib/trackProgress';
 import { CHIP_TO_CATEGORY } from '../lib/navigation';
+import { trackFounderMetric, FOUNDER_METRICS } from '../lib/founderAnalytics';
 
 export default function Questions({ selectedCategory, searchQuery, onSearchChange, activeChip, productionOnly = false }) {
   const [difficultyFilter, setDifficultyFilter] = useState('all');
@@ -77,6 +78,15 @@ export default function Questions({ selectedCategory, searchQuery, onSearchChang
       setSelectedId(null);
     }
   }, [filtered]);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const question = ALL_QUESTIONS.find((q) => q.id === selectedId);
+    if (!question) return;
+    trackFounderMetric(FOUNDER_METRICS.QUESTIONS_VIEWED, {
+      metadata: { questionId: question.id, category: question.category },
+    });
+  }, [selectedId]);
 
   const selectedQuestion = useMemo(() => {
     return filtered.find(q => q.id === selectedId) || null;

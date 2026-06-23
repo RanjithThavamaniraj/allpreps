@@ -3,6 +3,7 @@ import InterviewSetup from './InterviewSetup';
 import InterviewSession from './InterviewSession';
 import FinalReport from './FinalReport';
 import { selectInterviewQuestions } from '../utils/mockInterviewUtils';
+import { trackFounderMetric, FOUNDER_METRICS } from '../lib/founderAnalytics';
 
 const SCREENS = {
   SETUP: 'setup',
@@ -27,6 +28,9 @@ export default function MockInterview() {
   };
 
   const handleComplete = (completedSession) => {
+    trackFounderMetric(FOUNDER_METRICS.MOCK_INTERVIEWS_COMPLETED, {
+      metadata: { technology: completedSession.settings?.technology },
+    });
     setSession(completedSession);
     setScreen(SCREENS.REPORT);
     window.scrollTo({ top: 0, behavior: 'smooth' });

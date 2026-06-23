@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiMail, FiLock, FiUser, FiArrowLeft, FiCheckCircle } from 'react-icons/fi';
 import { navigateTo } from '../lib/navigation';
+import { trackFounderMetric, FOUNDER_METRICS } from '../lib/founderAnalytics';
 
 export default function Auth() {
   const [mode, setMode] = useState('login'); // 'login', 'register', 'verify'
@@ -14,6 +15,7 @@ export default function Auth() {
     setTimeout(() => {
       setLoading(false);
       localStorage.setItem('allpreps_registered_name', fullName);
+      trackFounderMetric(FOUNDER_METRICS.REGISTRATIONS, { metadata: { source: 'register' } });
       setMode('verify');
     }, 1500);
   };

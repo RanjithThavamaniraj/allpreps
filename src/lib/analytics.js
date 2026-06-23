@@ -1,3 +1,5 @@
+import { trackFounderMetric, FOUNDER_METRICS } from './founderAnalytics';
+
 const LOCAL_KEY = 'allpreps_analytics';
 const API_PATH = '/api/analytics';
 
@@ -6,6 +8,12 @@ const DEFAULT_ANALYTICS = {
   weekly_limit_hit: 0,
   upgrade_clicked: 0,
   pro_interest_submitted: 0,
+};
+
+const LEGACY_TO_FOUNDER = {
+  interview_started: FOUNDER_METRICS.MOCK_INTERVIEWS_STARTED,
+  upgrade_clicked: FOUNDER_METRICS.UPGRADE_TO_PRO_CLICKS,
+  pro_interest_submitted: FOUNDER_METRICS.WAITLIST_SIGNUPS,
 };
 
 /**
@@ -59,6 +67,10 @@ export async function trackEvent(event) {
   const local = getLocalAnalytics();
   local[event] = (local[event] || 0) + 1;
   saveLocalAnalytics(local);
+
+  if (LEGACY_TO_FOUNDER[event]) {
+    trackFounderMetric(LEGACY_TO_FOUNDER[event]);
+  }
 
   try {
     const res = await fetch(API_PATH, {

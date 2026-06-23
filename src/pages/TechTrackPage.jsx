@@ -11,6 +11,7 @@ import TrackLearningPath from '../components/TrackLearningPath';
 import PracticeTestSection from '../components/PracticeTestSection';
 import { getGlobalCompletedIds, subscribeToProgress, toggleTrackQuestion } from '../lib/trackProgress';
 import { mapQuestionForCard, SEARCH_PLACEHOLDER } from '../lib/questionMeta';
+import { trackFounderMetric, FOUNDER_METRICS } from '../lib/founderAnalytics';
 
 export default function TechTrackPage({
   trackId,
@@ -31,6 +32,7 @@ export default function TechTrackPage({
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [practiceLimit, setPracticeLimit] = useState(null);
   const questionsRef = useRef(null);
+  const practiceCompletedRef = useRef(false);
 
   useEffect(() => {
     const syncCompleted = () => setCompletedIds(getGlobalCompletedIds());
@@ -76,6 +78,10 @@ export default function TechTrackPage({
   }, [trackQuestions, searchQuery, difficultyFilter, practiceLimit]);
 
   const handleStartPractice = (level) => {
+    practiceCompletedRef.current = false;
+    trackFounderMetric(FOUNDER_METRICS.PRACTICE_TESTS_STARTED, {
+      metadata: { trackId, level },
+    });
     setDifficultyFilter(level);
     setPracticeLimit(10);
     setSearchQuery('');
@@ -85,7 +91,20 @@ export default function TechTrackPage({
   const handleDifficultyChange = (level) => {
     setDifficultyFilter(level);
     setPracticeLimit(null);
+    practiceCompletedRef.current = false;
   };
+
+  useEffect(() => {
+    if (!practiceLimit) return;
+    const practiceIds = filteredQuestions.map((q) => q.rawId);
+    const doneCount = practiceIds.filter((id) => completedIds.includes(id)).length;
+    if (doneCount >= practiceLimit && !practiceCompletedRef.current) {
+      practiceCompletedRef.current = true;
+      trackFounderMetric(FOUNDER_METRICS.PRACTICE_TESTS_COMPLETED, {
+        metadata: { trackId, level: difficultyFilter },
+      });
+    }
+  }, [completedIds, practiceLimit, filteredQuestions, trackId, difficultyFilter]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
