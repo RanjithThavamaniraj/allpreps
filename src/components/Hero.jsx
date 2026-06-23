@@ -12,22 +12,22 @@ const FEATURE_PILLS = [
     icon: Target,
     label: 'Practice Real Interviews',
     pro: true,
-    title: 'AI-powered mock interviews available in Pro',
+    title: 'Timed mock interviews with structured feedback — Pro',
   },
   {
     href: '/interview-questions?filter=production-scenarios#practice',
     icon: Zap,
-    label: 'Solve Real Production Scenarios',
-  },
-  {
-    href: '/roadmaps',
-    icon: BookOpen,
-    label: 'Interactive Learning Roadmaps',
+    label: 'Solve Production Scenarios',
   },
   {
     href: '/#learning-path',
-    icon: Map,
+    icon: BookOpen,
     label: 'Structured Learning Paths',
+  },
+  {
+    href: '/roadmaps',
+    icon: Map,
+    label: 'Technology-Specific Roadmaps',
   },
 ];
 
@@ -36,14 +36,15 @@ export default function Hero() {
     <section className="hero">
       <div className="container">
         <div className="hero-inner">
-          <p className="hero-kicker">AI-assisted interview preparation</p>
+          <p className="hero-kicker">Technical interview preparation for infrastructure engineers</p>
           <h1 className="hero-headline">
-            Ace Your IT Infrastructure Interviews with{' '}
-            <span className="hero-headline-accent">AI-Powered Preparation</span>
+            Master Technical Interviews for{' '}
+            <span className="hero-headline-accent">Modern Infrastructure Roles</span>
           </h1>
           <p className="hero-sub">
-            Practice with AI-guided mock interviews, production troubleshooting scenarios, and
-            structured learning paths — built for engineers preparing for real infrastructure roles.
+            Practice real interview questions from a searchable question bank, solve production
+            scenarios, follow structured learning paths, and prepare confidently for cloud,
+            database, Linux, and DevOps roles.
           </p>
 
           <div className="hero-actions">
@@ -51,7 +52,7 @@ export default function Hero() {
               Practice Mock Interviews
               <span
                 className="hero-pro-badge hero-pro-badge-inline"
-                data-tooltip="AI-powered mock interviews available in Pro"
+                data-tooltip="Full mock interview sessions with detailed feedback — Pro"
                 aria-label="Pro feature"
               >
                 PRO
@@ -95,8 +96,8 @@ export default function Hero() {
                 {pill.pro && (
                   <span
                     className="hero-pro-badge"
-                    data-tooltip="AI-powered mock interviews available in Pro"
-                    aria-label="Pro feature: AI-powered mock interviews available in Pro"
+                    data-tooltip="Full mock interview sessions with detailed feedback — Pro"
+                    aria-label="Pro feature: full mock interview sessions with detailed feedback"
                   >
                     PRO
                   </span>
